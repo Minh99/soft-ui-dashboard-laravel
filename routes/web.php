@@ -25,9 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/', [HomeController::class, 'home']);
-	Route::get('dashboard', function () {
-		return view('dashboard');
-	})->name('dashboard');
+	Route::get('dashboard', [HomeController::class, 'index'])->name('dashboard');
 
 	Route::get('billing', function () {
 		return view('billing');
@@ -67,6 +65,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/login', function () {
 		return view('dashboard');
 	})->name('sign-up');
+
+
+
+	Route::get('quiz-first',[HomeController::class, 'QuizFirst'])->name('quiz-first');
+	Route::post('quiz-first',[HomeController::class, 'QuizFirstSubmit'])->name('quiz-first-submit');
 });
 
 

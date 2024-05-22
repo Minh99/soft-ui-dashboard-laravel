@@ -44,5 +44,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    
+
+    public function knowns()
+    {
+        return $this->hasMany(UserKnown::class);
+    }
+
+    public function vocabularies()
+    {
+        return $this->belongsToMany(Vocabulary::class, 'user_knowns');
+    }
 }
