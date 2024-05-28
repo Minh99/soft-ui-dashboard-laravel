@@ -6,6 +6,8 @@ use App\Http\Controllers\InfoUserController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ResetController;
 use App\Http\Controllers\SessionsController;
+use App\Http\Controllers\StoryController;
+use App\Http\Controllers\TopicController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +72,21 @@ Route::group(['middleware' => 'auth'], function () {
 
 	Route::get('quiz-first',[HomeController::class, 'QuizFirst'])->name('quiz-first');
 	Route::post('quiz-first',[HomeController::class, 'QuizFirstSubmit'])->name('quiz-first-submit');
+
+
+	Route::get('topics',[TopicController::class, 'index'])->name('topics');
+
+
+	// by user topic
+	Route::get('topics/{id}',[TopicController::class, 'getTopicByUser'])->name('topics.detail');
+	Route::get('quiz-for/{topicUserId}',[HomeController::class, 'QuizFor'])->name('quiz-for');
+	Route::post('quiz-for/{topicUserId}',[HomeController::class, 'QuizForSubmit'])->name('quiz-for-submit');
+
+	// API
+	Route::get('generate-stories/{topicId}',[StoryController::class, 'generate'])->name('generate-stories');
+	Route::get('generate-question/{topicUserId}',[StoryController::class, 'generateQuestion'])->name('generate-question');
+	Route::get('generate-answer/{topicUserId}',[StoryController::class, 'generateAnswer'])->name('generate-answer');
+
 });
 
 

@@ -4,7 +4,7 @@ namespace App\Http\Services;
 
 use App\Models\Vocabulary;
 
-class VocabularyService
+class VocabularyService extends BaseService
 {
     /**
      * Constructor
@@ -46,7 +46,31 @@ class VocabularyService
 
         $types = [
             'radio',
-            'text-enter',
+            // 'text-enter',
+        ];
+
+        foreach ($vocabularies as $key => $vocabulary) {
+            $vocabularies[$key]['type'] = $types[array_rand($types)];
+        }
+        
+        return $vocabularies;
+    }
+
+    public function getQuizFor($topicUser)
+    {
+        $data = $topicUser->data ? json_decode($topicUser->data, true) : [];
+        $words = $data['words'] ?? [];
+        $words = collect($words);
+        $words = $words->pluck('word');
+
+        $vocabularies = Vocabulary::whereIn('en', $words)->get();
+
+        $vocabularies = $vocabularies->shuffle();
+        $vocabularies = $vocabularies->toArray();
+
+        $types = [
+            'radio',
+            // 'text-enter',
         ];
 
         foreach ($vocabularies as $key => $vocabulary) {

@@ -15,7 +15,7 @@
                 <p class="mb-1 pt-2 text-bold">Bắt đầu ngay với những câu chuyện</p>
                 <h5 class="font-weight-bolder">Học cùng Chat Bot</h5>
                 <p class="mb-5">Chủ đề câu chuyện xoay quanh các từ vựng mà bạn chưa biết.</p>
-                <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+                <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{{ route('topics') }}">
                   Bắt đầu ngay
                   <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
                 </a>

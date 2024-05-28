@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\BaseService;
 use App\Http\Services\VocabularyService;
+use App\Models\TopicUser;
+use App\Models\User;
 use App\Models\UserDayCompleted;
 use App\Models\UserKnown;
 use Illuminate\Http\Request;
@@ -21,13 +24,21 @@ class HomeController extends Controller
     protected $vocabularyService;
 
     /**
+     * BaseService service
+     *
+     * @var BaseService
+     */
+    protected $baseService;
+
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(VocabularyService $vocabularyService)
+    public function __construct(VocabularyService $vocabularyService, BaseService $baseService)
     {
         $this->vocabularyService = $vocabularyService;
+        $this->baseService = $baseService;
     }
 
     public function home()
@@ -49,6 +60,7 @@ class HomeController extends Controller
         $user = Auth::user();
 
         if ($user->is_first_login) {
+            // TODO middleware
             return redirect('quiz-first');
         }
 
@@ -81,6 +93,92 @@ class HomeController extends Controller
         $userDay->save();
         $userDay->refresh();
 
+        $vocabularies = $this->vocabularyService->getVocabularies();
+        $vocabularies = collect($vocabularies);
+        $data = $request->except('_token');
+
+        $listKnownByUser = [];
+        $listUnknownByUser = [];
+        foreach ($data as $key => $value) {
+            // 28-en
+            // 1-ko
+            $id = explode('-', $key)[0];
+            $type = explode('-', $key)[1];
+            
+            if ($type == 'en') {
+                if ($value == 1) {
+                    $listKnownByUser[] = intval($id);
+                }
+            } else {
+                $vocabulary = $vocabularies->where('id', $id)->first();
+                if ($vocabulary['en'] == $value) {
+                    $listKnownByUser[] = intval($id);
+                }
+            }
+        }
+
+        $listUnknownByUser = $vocabularies->pluck('id')->diff($listKnownByUser)->toArray();
+
+        DB::beginTransaction();
+        try {
+            $dataInsert = [];
+            foreach ($listKnownByUser as $vocabularyId) {
+                $dataInsert[] = [
+                    'user_id' => $user->id,
+                    'vocabulary_id' => $vocabularyId,
+                    'is_known' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            foreach ($listUnknownByUser as $vocabularyId) {
+                $dataInsert[] = [
+                    'user_id' => $user->id,
+                    'vocabulary_id' => $vocabularyId,
+                    'is_known' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            $userDay->vocabulary_ids = $listKnownByUser;
+            $userDay->save();
+
+            DB::table('user_knowns')->insert($dataInsert);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred. Please try again.');
+        }
+
+        return redirect('dashboard');
+    }
+
+
+    public function QuizFor($topicUserId)
+    {
+        $user = auth()->user();
+       
+        $topicUser = TopicUser::where('user_id', $user->id)->where('id', $topicUserId)->first();
+
+        $quizTypeRandom = $this->vocabularyService->getQuizFor($topicUser);
+
+        return view('quiz-for', [
+            'topicUser' => $topicUser,
+            'quizTypeRandom' => $quizTypeRandom,
+        ]);
+    }
+
+    public function QuizForSubmit(Request $request)
+    {
+        $user = Auth::user();
+        // Day1: 1 story - 10 words
+        // Day2-3-5: 2 story - 15 words
+
+        $userDay = UserDayCompleted::where('user_id', $user->id)->where('is_completed', false)->first();
+
+        
         $vocabularies = $this->vocabularyService->getVocabularies();
         $vocabularies = collect($vocabularies);
         $data = $request->except('_token');

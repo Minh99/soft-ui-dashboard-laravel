@@ -194,13 +194,15 @@
               <ul class="list-group">
                 <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
                   <div class="avatar me-3">
-                    <img src="../assets/img/kal-visuals-square.jpg" alt="kal" class="border-radius-lg shadow">
+                    <h2 class="text-dark text-gradient m-0">1</h2>
                   </div>
                   <div class="d-flex align-items-start flex-column justify-content-center">
-                    <h6 class="mb-0 text-sm">Sophie B.</h6>
+                    <h6 id="vocabulary-one" class="mb-0 text-sm">Sophie B.</h6>
                     <p class="mb-0 text-xs">Hi! I need more information..</p>
                   </div>
-                  <a class="btn btn-link pe-3 ps-0 mb-0 ms-auto" href="javascript:;">Reply</a>
+                  <a class="btn btn-link pe-3 ps-0 mb-0 ms-auto" href="javascript:;">
+                    <i onclick="speak('banana')" id="vocabulary-one-listen" class="fas fa-headphones text-secondary text-sm"></i>
+                  </a>
                 </li>
                 <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
                   <div class="avatar me-3">
@@ -210,8 +212,24 @@
                     <h6 class="mb-0 text-sm">Anne Marie</h6>
                     <p class="mb-0 text-xs">Awesome work, can you..</p>
                   </div>
-                  <a class="btn btn-link pe-3 ps-0 mb-0 ms-auto" href="javascript:;">Reply</a>
+                  
+                    <i onclick="speak('apple')" id="vocabulary-one-listen" class="fas fa-headphones text-secondary text-sm"></i>
                 </li>
+                <script>
+                  function speak(text) {
+                    // Create a SpeechSynthesisUtterance
+                    const utterance = new SpeechSynthesisUtterance(text);
+
+                    // Select a voice
+                    const voices = speechSynthesis.getVoices();
+                    console.log(voices);
+                    utterance.voice = voices[0];
+
+                    // Speak the text
+                    speechSynthesis.speak(utterance);
+                  }
+
+                  </script>
                 <li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">
                   <div class="avatar me-3">
                     <img src="../assets/img/ivana-square.jpg" alt="kal" class="border-radius-lg shadow">
