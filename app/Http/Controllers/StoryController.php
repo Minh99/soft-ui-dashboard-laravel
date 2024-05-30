@@ -14,6 +14,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Gemini\Data\GenerationConfig;
+use Gemini\Enums\HarmBlockThreshold;
+use Gemini\Data\SafetySetting;
+use Gemini\Enums\HarmCategory;
+use Gemini\Enums\ModelType;
 
 class StoryController extends Controller
 {
@@ -35,6 +40,66 @@ class StoryController extends Controller
         $this->vocabularyService = $vocabularyService;
     }
 
+    public function setUpClient($histories = [])
+    {
+        $safetySettingDangerousContent = new SafetySetting(
+            category: HarmCategory::HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold::BLOCK_NONE
+        );
+        
+        $safetySettingHateSpeech = new SafetySetting(
+            category: HarmCategory::HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold::BLOCK_NONE
+        );
+
+        $safetySettingHarassment = new SafetySetting(
+            category: HarmCategory::HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold::BLOCK_NONE
+        );
+        
+        $safetySettingSexuallyExplicit = new SafetySetting(
+            category: HarmCategory::HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold::BLOCK_NONE
+        );
+
+        
+        $generationConfig = new GenerationConfig(
+            maxOutputTokens: 10000,
+        );
+
+        $YOUR_API_KEY= env('GEMINI_API_KEY');
+        $client = Gemini::client($YOUR_API_KEY);
+        // $response = $client->models()->list();
+        // dd($response->models);
+        // $response  = $client->models()->retrieve(ModelType::GEMINI_PRO_15_FLASK);
+        // dd($response->model);
+
+        return $client
+            // ->geminiPro()
+            ->geminiPro15Flask()
+            ->withSafetySetting($safetySettingDangerousContent)
+            ->withSafetySetting($safetySettingHateSpeech)
+            ->withSafetySetting($safetySettingHarassment)
+            ->withSafetySetting($safetySettingSexuallyExplicit)
+            ->withGenerationConfig($generationConfig)
+            ->startChat(history: $histories);
+    }
+
+
+    public function formatToJson($text)
+    {
+        Log::info($text);
+        $cleaned_json_string = str_replace('\"', '"', $text);
+        $cleaned_json_string = str_replace('\\n', '', $cleaned_json_string);
+        $cleaned_json_string = str_replace(["json", "```"], '', $cleaned_json_string);
+        $cleaned_json_string = preg_replace('/\n+/', '', $cleaned_json_string);
+        $cleaned_json_string = trim($cleaned_json_string, '"');
+
+        Log::info($cleaned_json_string);
+        
+        return $cleaned_json_string;
+    }
+
     /**
      * Generate story
      *
@@ -47,8 +112,7 @@ class StoryController extends Controller
         $topic = Topic::find($topicId);
         $topicName = $topic->name;
         $topicId = $topic->id;
-        $YOUR_API_KEY= env('GEMINI_API_KEY');
-        $client = Gemini::client($YOUR_API_KEY);
+
         $user = auth()->user();
 
         if (!$user) {
@@ -58,35 +122,18 @@ class StoryController extends Controller
             ]);
         }
 
-        $LIMIT_WORDS_GEN = 300;
+        $LIMIT_WORDS_GEN = 400;
         
         $vocabulariesToGenStory = $this->vocabularyService->getVocabulariesToGenStory($user);
         Log::info('vocabulariesToGenStory', $vocabulariesToGenStory);
 
-        $vocabulariesToGenStory = implode(', ', $vocabulariesToGenStory);
+        $voc = '';
+        foreach ($vocabulariesToGenStory as  $k => $vocabulary) {
+            $voc .= ($k+1). '. ' . $vocabulary . ' \n';
+        }
 
-        $prompt = "Create a story about the topic [$topicName], using the following words: [$vocabulariesToGenStory]";
-        $formattedPrompt = "\n1. Content of the story. The story should be $LIMIT_WORDS_GEN words long.
-        \n 2. List of words used in the story [word , explanation], the explanation must be in the story.";
-        
-        $jsonExample = "
-            {
-                content: Content of the story. The story should be $LIMIT_WORDS_GEN words long,
-                words: [
-                    {
-                        word: value 2,
-                        explanation: value 3
-                    },
-                    {
-                        word: value 4,
-                        explanation: value 5
-                    }
-                ]
-            }
-        ";
-
-        $prompt .= $formattedPrompt;
-        $prompt .= "\n => Based on the content above, Please provide a response in a structured JSON format that matches the following model: " . $jsonExample;
+        $prompt = "Tạo ra 1 câu chuyện $LIMIT_WORDS_GEN từ với chủ đề [$topicName], có sử dụng các từ vựng như: \n $voc";
+        $prompt  .= "\nUser query:\nTrả 1 một chuỗi là tất cả các từ vựng được sử dụng với format JSON (không chứa các ký tự đặc biệt làm hỏng format JSON) như sau :\n{ \"content\": \"Content story\", \"words\": [{\"word\":\"love\", \"explanation\": \"love is love\"}] }";
 
         $basePrompt = [
             [
@@ -107,19 +154,17 @@ class StoryController extends Controller
         ];
 
         try {
-            $chat = $client
-                ->geminiPro()
-                ->startChat(history: [
-                    Content::parse(part: $basePrompt[0]['part'], role: Role::USER),
-                    Content::parse(part: $basePrompt[1]['part'], role: Role::MODEL),
-                ]);
-
+            $histories = [
+                Content::parse(part: $basePrompt[0]['part'], role: Role::USER),
+                Content::parse(part: $basePrompt[1]['part'], role: Role::MODEL),
+            ];
+            
+            $chat = $this->setUpClient($histories);
             $response = $chat->sendMessage($prompt);
 
             $text = $response->text();
-            $text = str_replace(["\`\`\`", "json", "```"], '', $text);
-            $text = preg_replace('/\n+/', '', $text);
-            Log::info($text);
+
+            $cleaned_json_string = $this->formatToJson($text);
 
             $basePrompt[] = [
                 "part" => $text,
@@ -134,8 +179,8 @@ class StoryController extends Controller
                     'topic_name' => $topicName,
                 ],
                 [
-                    'data' => $text,
-                    'history_chat' => $basePrompt,
+                    'data' => $cleaned_json_string,
+                    'history_chat' => json_encode($basePrompt),
                 ]
             );
 
@@ -178,9 +223,6 @@ class StoryController extends Controller
 
         $historyChat = empty($topicUser->history_chat) ? [] : json_decode($topicUser->history_chat, true);
 
-        $YOUR_API_KEY= env('GEMINI_API_KEY');
-        $client = Gemini::client($YOUR_API_KEY);
-
         $prompt = "Create a question based on the story you wrote and the words you used. The question should be related to the words and their explanations. The question must have an answer, and the answer must be one of the words used in the story.";
         
         $jsonExample = "
@@ -190,7 +232,7 @@ class StoryController extends Controller
             }
         ";
 
-        $prompt .= "\n => Please provide a response in a structured JSON format that matches the following model: " . $jsonExample;
+        $prompt .= "\n =>Please return the formatted json string that matches the following model: " . $jsonExample;
 
         $histories = [];
 
@@ -200,16 +242,12 @@ class StoryController extends Controller
         }
 
         try {
-            $chat = $client
-                ->geminiPro()
-                ->startChat(history: $histories);
-
+            $chat = $this->setUpClient($histories);
             $response = $chat->sendMessage($prompt);
 
             $text = $response->text();
-            $text = str_replace(["\`\`\`", "json", "```"], '', $text);
-            $text = preg_replace('/\n+/', '', $text);
-            Log::info($text);
+           
+            $cleaned_json_string = $this->formatToJson($text);
 
             $historyChat[] = [
                 "part" => $prompt,
@@ -230,10 +268,10 @@ class StoryController extends Controller
             return json_encode([
                 'status' => 200,
                 'message' => 'Success',
-                'data' => json_decode($text),
+                'data' => json_decode($cleaned_json_string),
             ]);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            Log::error($e);
             // dd($e);
             return json_encode([
                 'status' => 400,
@@ -264,35 +302,31 @@ class StoryController extends Controller
 
         $historyChat = empty($topicUser->history_chat) ? [] : json_decode($topicUser->history_chat, true);
 
-        $YOUR_API_KEY= env('GEMINI_API_KEY');
-        $client = Gemini::client($YOUR_API_KEY);
         $answer = $request->query('answer') ?? '';
+        $question = $request->query('question') ?? '';
 
-        // nếu câu trả lời sai vui lòng nhận xét và cung cấp câu trả lời đúng theo 1 trong format sau:
-        // - Câu trả lời đúng là: [câu trả lời đúng]
-        // - Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng]. Động viên bạn làm tốt hơn lần sau.
-        // - Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng]. [lý do câu trả lời đúng]
-        // - Sai mất rồi, câu trả lời đúng phải là: [câu trả lời đúng]. Động viên bạn làm tốt hơn lần sau.
-        // - Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng]. Bạn cần phải học kỹ hơn.
-        // nếu câu trả lời đúng, chúc mừng bạn đã trả lời đúng theo nhiều kiểu khác nhau.
-
-        $prompt = "Is this answer [$answer] correct?" . 
-            "If the answer is correct, congratulations on answering correctly in many different ways." .
-            " \nIf the answer is incorrect, please provide feedback and provide the correct answer in one of the following formats:" .
-            " \n- The correct answer is: [correct answer]" .
-            " \n- The answer is incorrect. Encourage you to do better next time." .
-            " \n- The answer is incorrect. reason for the correct answer" .
-            " \n- Wrong, the correct answer must be: [correct answer]. Encourage you to do better next time." .
-            " \n- The answer is incorrect. You need to study more.";
-        $jsonExample = '
+        $prompt = "Trả lời cho câu hỏi bạn đã tạo ra: [$question]. \nCâu trả lời của tôi là: [$answer]" . 
+            "\nUser query:" .
+            "\n- Nếu câu trả lời đúng, Hãy chúc mừng theo nhiều kiểu khác nhau.
+            \nKết quả Trả về một chuỗi JSON được định dạng như sau:\n
             {
-                "is_correct": true | false,
-                "comment": "based format above",
-                "correct_answer": "the correct answer is: [correct answer]"
-            }
-        ';
-
-        $prompt .= "\n => Please provide a response in a structured JSON format that matches the following model: " . $jsonExample;
+                \"is_correct\": true,
+                \"comment\": \"Chúc mừng bằng tiếng anh.\",
+                \"correct_answer\": \"câu trả lời đúng\"
+            }\n
+            \n- Nếu câu trả lời sai sẽ có 5 cách trả lời sau:
+            \n1.Câu trả lời đúng là: [câu trả lời đúng]
+            \n2.Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng]. Động viên bạn làm tốt hơn lần sau.
+            \n3.Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng].
+            \n4.Sai mất rồi, câu trả lời đúng phải là: [câu trả lời đúng]. Động viên bạn làm tốt hơn lần sau.
+            \n5.Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng]. Bạn cần phải đọc kỹ hơn.
+            \nKết quả Trả về một chuỗi JSON được định dạng như sau:\n
+            {
+                \"is_correct\": boolean,
+                \"comment\": \"Trả lời bằng tiếng anh theo 5 cách trên\",
+                \"correct_answer\": \"câu trả lời đúng\"
+            }\n
+        ";
 
         $histories = [];
         
@@ -302,13 +336,11 @@ class StoryController extends Controller
         }
 
         try {
-            $chat = $client
-                ->geminiPro()
-                ->startChat(history: $histories);
-
+            $chat = $this->setUpClient($histories);
             $response = $chat->sendMessage($prompt);
 
             $text = $response->text();
+            $cleaned_json_string = $this->formatToJson($text);
             Log::info($text);
 
             $historyChat[] = [
@@ -330,7 +362,7 @@ class StoryController extends Controller
             return json_encode([
                 'status' => 200,
                 'message' => 'Success',
-                'data' => json_decode($text),
+                'data' => json_decode($cleaned_json_string),
             ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());

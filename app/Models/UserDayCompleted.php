@@ -9,7 +9,7 @@ class UserDayCompleted extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_day_completed';
+    protected $table = 'user_day_completeds';
 
     protected $fillable = [
         'user_id',
@@ -20,4 +20,9 @@ class UserDayCompleted extends Model
         'is_passed_quiz_story_2',
         'vocabulary_ids',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

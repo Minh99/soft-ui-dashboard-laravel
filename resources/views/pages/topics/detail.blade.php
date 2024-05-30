@@ -67,12 +67,15 @@
                         <div class="card-header pb-0 p-3">
                             <h6 class="mb-0"> Questions and Answers (Complete at least {{ count($words) + 2 }} questions) </h6>
                         </div>
-                        <div class="card-body" id="quiz" data-count-quetion="0" data-done="{{ count($words) + 2 }}">
+                        <div class="card-body" id="quiz" data-count-quetion="0" data-done="2">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="row">
                                         <div class="spinner-grow text-info col-md-2" id="icon-loading" role="status"></div>
-                                        <p id="question" class="col-md-10"></p>
+                                        <p id="question" class="col-md-10">
+                                            {{-- bot gen --}}
+                                            <i id="question-icon" class="fas fa-question-circle"></i> &nbsp; Getting question...
+                                        </p>
                                     </div>
                                     <div class="row" id="area-quiz">
                                         {{-- bot gen --}}
@@ -88,8 +91,8 @@
                                 </button>
                             </div>
 
-                            <div class="d-flex justify-content-center mt-4">
-                                <a href="{{ route('') }}" class="btn btn-primary" id="submit" data-type-btn="submit">
+                            <div id="ready-test" class="d-flex justify-content-center mt-4 d-none">
+                                <a href="{{ route('quiz-for', ['topicUserId' => $topicUser->id ]) }}" class="btn btn-primary" id="submit" data-type-btn="submit">
                                     The test is ready
                                 </a>
                             </div>
@@ -102,19 +105,23 @@
 
     <script>
         setTimeout(() => {
-           getQuestion(1);
+           getQuestion(0);
         }, 3000);
 
-        function getQuestion($countQuetion) {
+        function getQuestion(countQuetion) {
             $('#icon-loading').show();
             $('#area-quiz').html('');
-            $('#question').text('');
+            $('#question').html(`<i id="question-icon" class="fas fa-question-circle"></i> &nbsp; Getting question...`);
 
-            var countQuetion = $('#quiz').data('count-quetion');
-            var topicId = '{{ $topicUser->topic_id }}';
+            let countDone = $('#quiz').data('done');
+
+            console.log(countQuetion, countDone);
+            if (parseInt(countQuetion) >= parseInt(countDone)) {
+                $('#ready-test').removeClass('d-none');
+            }
 
             $.ajax({
-                url: `/generate-question/${topicId}`,
+                url: "{{ route('generate-question', ['topicUserId' => $topicUser->id ]) }}",
                 type: 'GET',
                 success: function(data) {
                     var data = JSON.parse(data);
@@ -122,22 +129,28 @@
                     let question = data?.data?.question || '';
                     
                     if (status = 200 && question) {
-                        $('#question').text(question);
+                        $('#question').html(`<i id="question-icon" class="fas fa-question-circle"></i> &nbsp; ${question}`);
                     } else {
                         alert('Something went wrong! Please try again later.');
+                        setTimeout(function() {
+                            getQuestion(countQuetion);
+                        }, 3000);
                     }
                 },
                 error: function() {
                     alert('Something went wrong! Please try again later.');
-                    window.location.reload();
                 },
                 complete: function() {
-                    $('#quiz').data('count-quetion', countQuetion + 1);
+                    $('#quiz').attr('data-count-quetion', parseInt(countQuetion) + 1);
                     $('#answer').attr('disabled', false);
                     $('#answer').val('');
-                    $('#submit').attr('disabled', false);
                     $('#submit').data('type-btn', 'submit');
                     $('#submit').text('Submit Answer');
+
+                    setTimeout(function() {
+                        $('#submit').attr('disabled', false);
+                    }, 2000);
+
                     $('#icon-loading').hide();
                 }
             });
@@ -149,15 +162,22 @@
                     // show loading
                     $('#icon-loading').show();
                     $('#submit').attr('disabled', true);
-                    var countQuetion = $('#quiz').data('count-quetion');
-                    var topicId = '{{ $topicUser->topic_id }}';
 
                     var typeBtn = $('#submit').data('type-btn');
 
                     if (typeBtn == 'submit') {
+                        if ($('#answer').val() == '') {
+                            alert('Please enter your answer!');
+                            $('#icon-loading').hide();
+                            $('#submit').attr('disabled', false);
+                            return;
+                        }
+
                         $('#answer').attr('disabled', true);
+                        let answer = $('#answer').val();
+                        let question = $('#question').text();
                         $.ajax({
-                            url: `/generate-answer/${topicId}` + '?answer=' + $('#answer').val(),
+                            url: '{{ route("generate-answer", ["topicUserId" => $topicUser->id ]) }}' + `?answer=${answer}&question=${question}`,
                             type: 'GET',
                             success: function(data) {
                                 var data = JSON.parse(data);
@@ -193,20 +213,27 @@
 
                                     $('#area-quiz').append(html);
                                 } else {
+                                    console.log(data);
                                     alert('Something went wrong! Please try again later.');
                                 }
                             },
                             error: function() {
+                                console.log("error");
+                                console.log(data);
+                                console.log("error=====");
                                 alert('Something went wrong! Please try again later.');
                             },
                             complete: function() {
                                 $('#submit').data('type-btn', 'next');
                                 $('#submit').text('Next Question');
-                                $('#submit').attr('disabled', false);
+                                setTimeout(function() {
+                                    $('#submit').attr('disabled', false);
+                                }, 2000);
                                 $('#icon-loading').hide();
                             }
                         });
                     } else {
+                        let countQuetion = $('#quiz').attr('data-count-quetion');
                         getQuestion(countQuetion);
                     }
                 });

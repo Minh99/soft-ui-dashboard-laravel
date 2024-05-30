@@ -14,9 +14,9 @@ class BaseService
 
     public function getVocabulariesToGenStory($user)
     {
-        $LIMIT_VOCABULARY = 5;
-        $LIMIT_UN_KNOW = 4;
-        $LIMIT_KNOW = 1;
+        $LIMIT_VOCABULARY = 15;
+        $LIMIT_UN_KNOW = 13;
+        $LIMIT_KNOW = 2;
 
         $userKnowsCollection = UserKnown::where('user_id', $user->id)->get();
 
@@ -51,11 +51,5 @@ class BaseService
         }
 
         return array_merge($userUnKnows, $userKnows);
-    }
-
-
-    public function checkProcess($user)
-    {
-        
     }
 }

@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Vocabulary::class, 'user_knowns');
     }
+
+    public function dayCompleteds()
+    {
+        return $this->hasMany(UserDayCompleted::class);
+    }
 }

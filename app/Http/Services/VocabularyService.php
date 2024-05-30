@@ -41,7 +41,6 @@ class VocabularyService extends BaseService
         $vocabularies = collect($vocabularies);
 
         $vocabularies = $vocabularies->shuffle();
-        $vocabularies = $vocabularies->take(3);
         $vocabularies = $vocabularies->toArray();
 
         $types = [

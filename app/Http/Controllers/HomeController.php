@@ -64,10 +64,13 @@ class HomeController extends Controller
             return redirect('quiz-first');
         }
 
+        $userDay = $user->dayCompleteds()->where('is_completed', false)->first();
+
         return view('dashboard', [
             'vocabularies' => $vocabularies,
             'count_total' => $count,
             'known_by_user' => $knownByUser,
+            'userDay' => $userDay,
         ]);
     }
 
@@ -178,13 +181,46 @@ class HomeController extends Controller
 
         $userDay = UserDayCompleted::where('user_id', $user->id)->where('is_completed', false)->first();
 
-        
+        if (!$userDay) {
+            $user->is_first_login = false;
+            $user->save();
+            $userDay = new UserDayCompleted();
+            $userDay->user_id = $user->id;
+            $userDay->is_passed_first_quiz = false;
+            $userDay->day_number = 1;
+            $userDay->save();
+        } else {
+            $isPassedFirstQuiz = $userDay->is_passed_first_quiz;
+            $isPassedQuizStory1 = $userDay->is_passed_quiz_story_1;
+            $isPassedQuizStory2 = $userDay->is_passed_quiz_story_2;
+            $dayNumber = $userDay->day_number;
+
+            switch ($dayNumber) {
+                case 1:
+                    if (!$isPassedQuizStory1) {
+                        $userDay->is_passed_quiz_story_1 = true;
+                    }
+                    break;
+                case 2:
+                case 3:
+                case 5:
+                    if (!$isPassedQuizStory1) {
+                        $userDay->is_passed_quiz_story_1 = true;
+                    }
+                    if ($isPassedQuizStory1 && !$isPassedQuizStory2) {
+                        $userDay->is_passed_quiz_story_2 = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         $vocabularies = $this->vocabularyService->getVocabularies();
         $vocabularies = collect($vocabularies);
         $data = $request->except('_token');
 
         $listKnownByUser = [];
-        $listUnknownByUser = [];
         foreach ($data as $key => $value) {
             // 28-en
             // 1-ko
@@ -203,34 +239,20 @@ class HomeController extends Controller
             }
         }
 
-        $listUnknownByUser = $vocabularies->pluck('id')->diff($listKnownByUser)->toArray();
-
         DB::beginTransaction();
         try {
-            $dataInsert = [];
             foreach ($listKnownByUser as $vocabularyId) {
-                $dataInsert[] = [
+                DB::table('user_knowns')->updateOrInsert([
                     'user_id' => $user->id,
                     'vocabulary_id' => $vocabularyId,
+                ], [
                     'is_known' => true,
-                    'created_at' => now(),
                     'updated_at' => now(),
-                ];
+                ]);
             }
-            foreach ($listUnknownByUser as $vocabularyId) {
-                $dataInsert[] = [
-                    'user_id' => $user->id,
-                    'vocabulary_id' => $vocabularyId,
-                    'is_known' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            $userDay->vocabulary_ids = $listKnownByUser;
+            $userDay->vocabulary_ids = array_merge(json_decode($userDay->vocabulary_ids, true), $listKnownByUser);
             $userDay->save();
 
-            DB::table('user_knowns')->insert($dataInsert);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
