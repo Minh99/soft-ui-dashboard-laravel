@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\PromptService;
 use App\Http\Services\VocabularyService;
 use App\Models\Topic;
 use App\Models\TopicUser;
@@ -19,6 +20,7 @@ use Gemini\Enums\HarmBlockThreshold;
 use Gemini\Data\SafetySetting;
 use Gemini\Enums\HarmCategory;
 use Gemini\Enums\ModelType;
+use Illuminate\Support\Facades\Session;
 
 class StoryController extends Controller
 {
@@ -29,15 +31,17 @@ class StoryController extends Controller
      * @var VocabularyService
      */
     protected $vocabularyService;
+    protected $promptService;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(VocabularyService $vocabularyService)
+    public function __construct(VocabularyService $vocabularyService, PromptService $promptService)
     {
         $this->vocabularyService = $vocabularyService;
+        $this->promptService = $promptService;
     }
 
     public function setUpClient($histories = [])
@@ -89,7 +93,7 @@ class StoryController extends Controller
     public function formatToJson($text)
     {
         Log::info($text);
-        $cleaned_json_string = str_replace('\"', '"', $text);
+        $cleaned_json_string = str_replace('\"', '`', $text);
         $cleaned_json_string = str_replace('\\n', '', $cleaned_json_string);
         $cleaned_json_string = str_replace(["json", "```"], '', $cleaned_json_string);
         $cleaned_json_string = preg_replace('/\n+/', '', $cleaned_json_string);
@@ -109,11 +113,13 @@ class StoryController extends Controller
      */
     public function generate(Request $request, $topicId)
     {
+        $LIMIT_WORDS_GEN = PromptService::LIMIT_WORDS_GEN;
         $topic = Topic::find($topicId);
         $topicName = $topic->name;
         $topicId = $topic->id;
 
         $user = auth()->user();
+        Session::put('CanSubmit', true);
 
         if (!$user) {
             return json_encode([
@@ -121,20 +127,11 @@ class StoryController extends Controller
                 'message' => 'User not found!',
             ]);
         }
-
-        $LIMIT_WORDS_GEN = 400;
         
-        $vocabulariesToGenStory = $this->vocabularyService->getVocabulariesToGenStory($user);
-        Log::info('vocabulariesToGenStory', $vocabulariesToGenStory);
+        list($vocabulariesToGenStory, $prompt, $typeQuiz) = $this->promptService->promptGenStory($user, $topicName);
 
-        $voc = '';
-        foreach ($vocabulariesToGenStory as  $k => $vocabulary) {
-            $voc .= ($k+1). '. ' . $vocabulary . ' \n';
-        }
-
-        $prompt = "Tạo ra 1 câu chuyện $LIMIT_WORDS_GEN từ với chủ đề [$topicName], có sử dụng các từ vựng như: \n $voc";
-        $prompt  .= "\nUser query:\nTrả 1 một chuỗi là tất cả các từ vựng được sử dụng với format JSON (không chứa các ký tự đặc biệt làm hỏng format JSON) như sau :\n{ \"content\": \"Content story\", \"words\": [{\"word\":\"love\", \"explanation\": \"love is love\"}] }";
-
+        Log::info('vocabulariesToGenStory: '. $vocabulariesToGenStory);
+        
         $basePrompt = [
             [
                 "part" => "The stories you write about what I have to say should be $LIMIT_WORDS_GEN words. Is that clear?",
@@ -153,12 +150,19 @@ class StoryController extends Controller
             ]
         ];
 
+        $numberTry = 3;
+
         try {
             $histories = [
                 Content::parse(part: $basePrompt[0]['part'], role: Role::USER),
                 Content::parse(part: $basePrompt[1]['part'], role: Role::MODEL),
             ];
+
+            tryGenStory:
             
+            $basePromptTmp = $basePrompt;
+            Log::info('Number try: '. $numberTry);
+            $basePromptTmp = $basePrompt;
             $chat = $this->setUpClient($histories);
             $response = $chat->sendMessage($prompt);
 
@@ -166,7 +170,7 @@ class StoryController extends Controller
 
             $cleaned_json_string = $this->formatToJson($text);
 
-            $basePrompt[] = [
+            $basePromptTmp[] = [
                 "part" => $text,
                 "role" => Role::MODEL,
                 "sort_order" => 4,
@@ -180,7 +184,7 @@ class StoryController extends Controller
                 ],
                 [
                     'data' => $cleaned_json_string,
-                    'history_chat' => json_encode($basePrompt),
+                    'history_chat' => json_encode($basePromptTmp),
                 ]
             );
 
@@ -190,10 +194,12 @@ class StoryController extends Controller
                 'status' => 200,
                 'message' => 'Success',
                 'genId' => $genId,
+                'typeQuiz' => $typeQuiz,
             ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            // dd($e);
+            $numberTry -= 1;
+            if ($numberTry > 0) goto tryGenStory;
             return json_encode([
                 'status' => 400,
                 'message' => 'An error occurred. Please try again.',
@@ -241,7 +247,12 @@ class StoryController extends Controller
             $histories[] = Content::parse(part: $chat['part'], role: $role);
         }
 
+        $numberTry = 3;
+
         try {
+            tryQuestion:
+            Log::info('Number try question: '. $numberTry);
+            $historyChatTmp = $historyChat;
             $chat = $this->setUpClient($histories);
             $response = $chat->sendMessage($prompt);
 
@@ -249,20 +260,20 @@ class StoryController extends Controller
            
             $cleaned_json_string = $this->formatToJson($text);
 
-            $historyChat[] = [
+            $historyChatTmp[] = [
                 "part" => $prompt,
                 "role" => Role::USER,
-                "sort_order" => count($historyChat) + 1,
+                "sort_order" => count($historyChatTmp) + 1,
             ];
 
-            $historyChat[] = [
+            $historyChatTmp[] = [
                 "part" => $text,
                 "role" => Role::MODEL,
-                "sort_order" => count($historyChat) + 1,
+                "sort_order" => count($historyChatTmp) + 1,
             ];
 
             TopicUser::where('id', $topicUserId)->update([
-                'history_chat' => $historyChat,
+                'history_chat' => $historyChatTmp,
             ]);
 
             return json_encode([
@@ -273,6 +284,8 @@ class StoryController extends Controller
         } catch (\Exception $e) {
             Log::error($e);
             // dd($e);
+            $numberTry -= 1;
+            if ($numberTry > 0) goto tryQuestion;
             return json_encode([
                 'status' => 400,
                 'message' => 'An error occurred. Please try again.',
@@ -335,7 +348,12 @@ class StoryController extends Controller
             $histories[] = Content::parse(part: $chat['part'], role: $role);
         }
 
+        $numberTry = 3;
+
         try {
+            tryAnswer:
+            Log::info('Number try answer: '. $numberTry);
+            $historyChatTmp = $historyChat;
             $chat = $this->setUpClient($histories);
             $response = $chat->sendMessage($prompt);
 
@@ -343,20 +361,20 @@ class StoryController extends Controller
             $cleaned_json_string = $this->formatToJson($text);
             Log::info($text);
 
-            $historyChat[] = [
+            $historyChatTmp[] = [
                 "part" => $prompt,
                 "role" => Role::USER,
-                "sort_order" => count($historyChat) + 1,
+                "sort_order" => count($historyChatTmp) + 1,
             ];
 
-            $historyChat[] = [
+            $historyChatTmp[] = [
                 "part" => $text,
                 "role" => Role::MODEL,
-                "sort_order" => count($historyChat) + 1,
+                "sort_order" => count($historyChatTmp) + 1,
             ];
 
             TopicUser::where('id', $topicUserId)->update([
-                'history_chat' => $historyChat,
+                'history_chat' => $historyChatTmp,
             ]);
 
             return json_encode([
@@ -367,6 +385,8 @@ class StoryController extends Controller
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             // dd($e);
+            $numberTry -= 1;
+            if ($numberTry > 0) goto tryAnswer;
             return json_encode([
                 'status' => 400,
                 'message' => 'An error occurred. Please try again.',

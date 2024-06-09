@@ -11,7 +11,7 @@
                         <span>{{ count($quizTypeRandom) }}  questions</span>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('quiz-for-submit', ['topicUserId' => $topicUser->id]) }}" method="POST">
+                        <form action="{{ route('quiz-for-submit') }}" method="POST">
                             @csrf
                             <div class="form-group">
                                 @foreach ($quizTypeRandom as $key => $question)

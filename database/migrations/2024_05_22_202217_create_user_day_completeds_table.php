@@ -19,7 +19,14 @@ return new class extends Migration
             $table->boolean('is_passed_first_quiz')->default(false);
             $table->boolean('is_passed_quiz_story_1')->default(false);
             $table->boolean('is_passed_quiz_story_2')->default(false);
+            $table->boolean('is_passed_quiz_story_3')->default(false);
+            $table->boolean('is_passed_quiz_story_4')->default(false);
+            $table->boolean('is_passed_test_2')->default(false);
             $table->json('vocabulary_ids')->nullable();
+            $table->string('words_to_gen_story_1')->nullable();
+            $table->string('words_to_gen_story_2')->nullable();
+            $table->string('words_to_gen_story_3')->nullable();
+            $table->string('words_to_gen_story_4')->nullable();
             $table->timestamps();
         });
     }

@@ -18,7 +18,14 @@ class UserDayCompleted extends Model
         'is_passed_first_quiz',
         'is_passed_quiz_story_1',
         'is_passed_quiz_story_2',
+        'is_passed_quiz_story_3',
+        'is_passed_quiz_story_4',
+        'is_passed_test_2',
         'vocabulary_ids',
+        'words_to_gen_story_1',
+        'words_to_gen_story_2',
+        'words_to_gen_story_3',
+        'words_to_gen_story_4',
     ];
 
     public function user()

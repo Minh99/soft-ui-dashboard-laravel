@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -65,17 +66,31 @@ class HomeController extends Controller
         }
 
         $userDay = $user->dayCompleteds()->where('is_completed', false)->first();
+        $userDays = $user->dayCompleteds()->orderBy('day_number', 'asc')->get();
+
+        $dataUserDaysCountVoc = [];
+        $countPre = 0;
+        foreach ($userDays as $key => $userDay) {
+            $dataUserDaysCountVoc[] = count(json_decode($userDay->vocabulary_ids, true) ?? []) - $countPre;
+            $countPre = count(json_decode($userDay->vocabulary_ids, true) ?? []);
+        }
 
         return view('dashboard', [
             'vocabularies' => $vocabularies,
             'count_total' => $count,
             'known_by_user' => $knownByUser,
             'userDay' => $userDay,
+            'dataUserDaysCountVoc' => implode(',', $dataUserDaysCountVoc),
         ]);
     }
 
     public function QuizFirst()
     {
+        $user = Auth::user();
+        if (!$user->is_first_login) {
+            return redirect('dashboard');
+        }
+
         $quizTypeRandom = $this->vocabularyService->getQuizTypeRandom();
 
         return view('quiz-first', [
@@ -89,10 +104,16 @@ class HomeController extends Controller
         $user->is_first_login = false;
         $user->save();
         // TODO: DAY 1
-        $userDay = new UserDayCompleted();
-        $userDay->user_id = $user->id;
+        $userDay = UserDayCompleted::where('user_id', $user->id)->where('is_completed', false)->first();
+        if (!$userDay) {
+            $userDay = new UserDayCompleted();
+            $userDay->user_id = $user->id;
+            $userDay->is_passed_first_quiz = true;
+            $userDay->day_number = 1;
+            
+        }
+
         $userDay->is_passed_first_quiz = true;
-        $userDay->day_number = 1;
         $userDay->save();
         $userDay->refresh();
 
@@ -211,6 +232,10 @@ class HomeController extends Controller
                         $userDay->is_passed_quiz_story_2 = true;
                     }
                     break;
+                case 4:
+                case 6:
+                    $userDay->is_passed_first_quiz = true;
+                    break;
                 default:
                     break;
             }
@@ -261,5 +286,118 @@ class HomeController extends Controller
         }
 
         return redirect('dashboard');
+    }
+
+    // for days 4-6
+    public function Quiz()
+    {
+        $user = auth()->user();
+       
+        $userDay = UserDayCompleted::where('user_id', $user->id)->where('is_completed', false)->first();
+        
+        $dayNumber = $userDay->day_number;
+
+        $quizTypeRandom = null;
+
+        switch ($dayNumber) {
+            case 4:
+            case 6:
+                $quizTypeRandom = $this->vocabularyService->getQuiz($user, $dayNumber);
+                break;
+            default:
+                break;
+        }
+
+        return view('quiz-for', [
+            'quizTypeRandom' => $quizTypeRandom,
+        ]);
+    }
+
+    public function markDone($topicUserId)
+    {
+        $canSubmit = Session::get('CanSubmit', false);
+        if (!$canSubmit) {
+            abort(404);
+        }
+        $user = auth()->user();
+        $topicUser = TopicUser::where('user_id', $user->id)->where('id', $topicUserId)->first() ?? abort(404);
+        $userDay = UserDayCompleted::where('user_id', $user->id)->where('is_completed', false)->first();
+
+        if (!$userDay) {
+            $user->is_first_login = false;
+            $user->save();
+            $userDay = new UserDayCompleted();
+            $userDay->user_id = $user->id;
+            $userDay->is_passed_first_quiz = false;
+            $userDay->day_number = 1;
+            $userDay->save();
+        } else {
+            $isPassedQuizStory1 = $userDay->is_passed_quiz_story_1;
+            $isPassedQuizStory2 = $userDay->is_passed_quiz_story_2;
+            $isPassedQuizStory3 = $userDay->is_passed_quiz_story_3;
+            $isPassedQuizStory4 = $userDay->is_passed_quiz_story_4;
+            $dayNumber = $userDay->day_number;
+
+            switch ($dayNumber) {
+                case 1:
+                    if (!$isPassedQuizStory1) {
+                        $userDay->is_passed_quiz_story_1 = true;
+                    }
+                    if ($isPassedQuizStory1 && !$isPassedQuizStory2) {
+                        $userDay->is_passed_quiz_story_2 = true;
+                    }
+                    break;
+                case 2:
+                case 3:
+                case 5:
+                    if (!$isPassedQuizStory1) {
+                        $userDay->is_passed_quiz_story_1 = true;
+                    }
+                    if ($isPassedQuizStory1 && !$isPassedQuizStory2) {
+                        $userDay->is_passed_quiz_story_2 = true;
+                    }
+                    if ($isPassedQuizStory1 && $isPassedQuizStory2 && !$isPassedQuizStory3) {
+                        $userDay->is_passed_quiz_story_3 = true;
+                    }
+                    if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isPassedQuizStory3 && !$isPassedQuizStory4) {
+                        $userDay->is_passed_quiz_story_4 = true;
+                    }
+                    break;
+                case 4:
+                case 6:
+                    $userDay->is_passed_first_quiz = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        $dataWords = $topicUser->data ? json_decode($topicUser->data, true) : [];
+        $dataWords = $dataWords['words'] ?? [];
+        $words = collect($dataWords)->pluck('word');
+        $ens = $words->toArray() ?? [];
+        $vocabulariesIdByStory = $this->vocabularyService->getVocabulariesIdByEn($ens);
+
+        $userDay->vocabulary_ids = array_values(array_unique(array_merge(json_decode($userDay->vocabulary_ids, true) ?? [], $vocabulariesIdByStory)));
+        $userDay->save();
+
+        UserKnown::where('user_id', $user->id)->whereIn('vocabulary_id', $userDay->vocabulary_ids)->update([
+            'is_known' => true,
+        ]);
+
+        Session::forget('CanSubmit');
+
+        return redirect('dashboard');
+    }
+
+    public function markDoneTest2()
+    {
+        $user = auth()->user();
+        $userDay = UserDayCompleted::where('user_id', $user->id)->where('is_completed', false)->first();
+
+        $userDay->is_passed_test_2 = true;
+        $userDay->save();
+
+        return redirect('dashboard')->with('success', 'You have completed the test.');
     }
 }

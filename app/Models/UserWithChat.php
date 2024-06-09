@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vocabulary extends Model
+class UserWithChat extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'en',
-        'ko',
-        'vi',
+        'user_id',
+        'word',
+        'history',
     ];
 }

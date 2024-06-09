@@ -10,7 +10,7 @@
                             <h6 class="mb-1">Topics</h6>
                             <p class="text-sm">Choose your desired topic and let's get started</p>
                         </div>
-                        <div class="card-body">
+                        {{-- <div class="card-body">
                             <div class="card h-100 card-plain border">
                                 <div class="card-body d-flex flex-column justify-content-center text-center">
                                     <a href="javascript:;">
@@ -19,7 +19,7 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
                         <div class="card-body p-3">
                             <div class="row">
                                 <style>
@@ -49,8 +49,8 @@
                                                 <p class="text-gradient text-dark mb-2 text-sm">{{ $topic->name }}</p>
                                             </a>
                                             <div class="d-flex align-items-center justify-content-between">
-                                                <a data-topic-id="{{ $topic->id }}"  class="btn btn-outline-primary btn-sm mb-0 btn-go-to-topic-detail">
-                                                    start
+                                                <a data-topic-id="{{ $topic->id }}"  class="btn btn-outline-primary btn-sm mb-0 btn-go-to-topic-detail font-weight-bold">
+                                                    Start
                                                 </a>
                                             </div>
                                         </div>

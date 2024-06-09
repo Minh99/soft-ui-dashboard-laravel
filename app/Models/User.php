@@ -59,4 +59,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserDayCompleted::class);
     }
+
+    public function userKnowns()
+    {
+        return $this->hasMany(UserKnown::class);
+    }
 }

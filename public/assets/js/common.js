@@ -1,6 +1,11 @@
 // A $( document ).ready() block.
 $( document ).ready(function() {
 
+    // hide toast after 5 seconds
+    setTimeout(function() {
+        $('.toast-push').fadeOut('slow');
+    }, 3000);
+
     const btnGoToTopicDetail = $('.btn-go-to-topic-detail');
 
     btnGoToTopicDetail.on('click', function() {
@@ -14,9 +19,10 @@ $( document ).ready(function() {
                 var data = JSON.parse(data);
                 let status = data.status;
                 let genId = data?.genId || null;
+                let typeQuiz = data?.typeQuiz || null;
                 
                 if (status = 200 && genId) {
-                    window.location.href = `/topics/${genId}`;
+                    window.location.href = `/topics/${genId}/${typeQuiz}`;
                 } else {
                     // reload page
                     alert('Something went wrong! Please try again later.');
@@ -32,6 +38,5 @@ $( document ).ready(function() {
                 $('.loader').hide();
             }
         });
-
     });
 });

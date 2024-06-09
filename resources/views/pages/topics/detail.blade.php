@@ -65,9 +65,10 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header pb-0 p-3">
-                            <h6 class="mb-0"> Questions and Answers (Complete at least {{ count($words) + 2 }} questions) </h6>
+                            <h6 class="mb-0"> Questions and Answers (Complete at least {{ $typeQuiz == 2 ?  count($questions) : count($words) }} questions) </h6>
                         </div>
-                        <div class="card-body" id="quiz" data-count-quetion="0" data-done="2">
+                        {{-- quiz type 1, tu luan --}}
+                        <div class="card-body {{ $typeQuiz == 2 ? 'd-none' : '' }}" id="quiz" data-count-quetion="0" data-done="{{ count($words) }}">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="row">
@@ -85,17 +86,53 @@
                                     <textarea class="form-control" id="answer" rows="3"></textarea>
                                 </div>
                             </div>
-                            <div class="d-flex justify-content-end mt-4">
+                            <div class="d-flex mt-4">
                                 <button class="btn btn-primary" id="submit" data-type-btn="submit">
                                     Submit Answer
                                 </button>
                             </div>
+                        </div>
 
-                            <div id="ready-test" class="d-flex justify-content-center mt-4 d-none">
-                                <a href="{{ route('quiz-for', ['topicUserId' => $topicUser->id ]) }}" class="btn btn-primary" id="submit" data-type-btn="submit">
-                                    The test is ready
-                                </a>
+                        {{-- quiz type 2, trac nghiem --}}
+                        <div class="card-body {{ $typeQuiz == 1 ? 'd-none' : '' }}" id="quiz-tn">
+                            <i id="question-icon" class="fas fa-question-circle"></i> 
+                            @foreach ($questions as $key => $question)
+                                <div class="form-group">
+                                    <label for="question" class="form-check-label font-weight-bold" id="label-question-{{ $key }}">
+                                        {{ $key + 1 }}. {{ $question['question'] }}
+                                    </label>
+                                    @php
+                                        $mapKeys = ['A', 'B', 'C', 'D'];
+                                    @endphp
+                                    <div class="form-group" id="{{ $key }}-key">
+                                        @foreach ($question['answers'] as $k => $answer)
+                                            <div class="form-check">
+                                                <div class="form-check form-check-block">
+                                                    <input class="form-check-input" type="radio"
+                                                        name="{{ $key }}-value" data-key="{{$mapKeys[$k]}}" value="{{ $answer[$mapKeys[$k]] }}" id="{{ $key }}-answer{{ $k }}">
+                                                    <label class="form-check-label"
+                                                        for="{{ $key }}-answer{{ $k }}">{{ $answer[$mapKeys[$k]] }}</label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                            <div class="d-flex mt-4">
+                                <button class="btn btn-primary" id="submit-tn" data-type-btn="submit">
+                                    Submit Answer
+                                </button>
                             </div>
+                        </div>
+
+                        <div id="mark-done" class="d-flex justify-content-start mx-4 d-none">
+                            {{-- <a href="{{ route('quiz-for', ['topicUserId' => $topicUser->id ]) }}" class="btn btn-primary" id="submit" data-type-btn="submit">
+                                The test is ready
+                            </a> --}}
+                            <form action="{{ route('mark-done', ['topicUserId' => $topicUser->id ]) }}" method="POST">
+                                @csrf
+                                <button class="btn btn-success" type="submit">Mark as done</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -104,9 +141,15 @@
     </div>
 
     <script>
-        setTimeout(() => {
-           getQuestion(0);
-        }, 3000);
+        var typeQuiz = @json($typeQuiz);
+        var questions = @json($questions);
+
+        console.log(questions);
+        if (typeQuiz == 1) {
+            setTimeout(() => {
+                getQuestion(0);
+            }, 3000);
+        }
 
         function getQuestion(countQuetion) {
             $('#icon-loading').show();
@@ -117,7 +160,7 @@
 
             console.log(countQuetion, countDone);
             if (parseInt(countQuetion) >= parseInt(countDone)) {
-                $('#ready-test').removeClass('d-none');
+                $('#mark-done').removeClass('d-none');
             }
 
             $.ajax({
@@ -131,7 +174,6 @@
                     if (status = 200 && question) {
                         $('#question').html(`<i id="question-icon" class="fas fa-question-circle"></i> &nbsp; ${question}`);
                     } else {
-                        alert('Something went wrong! Please try again later.');
                         setTimeout(function() {
                             getQuestion(countQuetion);
                         }, 3000);
@@ -235,6 +277,31 @@
                     } else {
                         let countQuetion = $('#quiz').attr('data-count-quetion');
                         getQuestion(countQuetion);
+                    }
+                });
+
+                $('#submit-tn').click(function() {
+                    var questions = @json($questions);
+                    var count = 0;
+
+                    for (let i = 0; i < questions.length; i++) {
+                        var names = i + '-value';
+                        var dataKey = $('input[name=' + names + ']:checked').data('key');
+                        var correctAnswer = questions[i]['answer_correct'];
+
+                        $('#label-question-' + i).find('span').remove();
+                        if (dataKey === correctAnswer) {
+                            $('#label-question-' + i).append('<span class="text-success text-sx">✅</span>');
+                            count++;
+                        } else {
+                            $('#label-question-' + i).append('<span class="text-danger text-sx">❌</span>');
+                        } 
+                    }
+
+                    $('#submit-tn').text('Check again');
+
+                    if (count >= questions.length - 3) {
+                        $('#mark-done').removeClass('d-none');
                     }
                 });
             });
