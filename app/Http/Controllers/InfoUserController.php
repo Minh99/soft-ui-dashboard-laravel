@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Vocabulary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -94,7 +95,21 @@ class InfoUserController extends Controller
         }
 
         $user = User::findOrFail($id);
+        $userDays = $user->dayCompleteds()->orderBy('day_number', 'asc')->get();
 
-        return view('user-report-detail', ['user' => $user]);
+        $dataUserDaysCountVocReport = [];
+        $countPre = 0;
+        foreach ($userDays as $key => $userDay) {
+            $dataUserDaysCountVocReport[] = count(json_decode($userDay->vocabulary_ids, true) ?? []) - $countPre;
+            $countPre = count(json_decode($userDay->vocabulary_ids, true) ?? []);
+        }
+
+        $countVocabulary = Vocabulary::count();
+
+        return view('user-report-detail', [
+            'user' => $user,
+            'dataUserDaysCountVocReport' => implode(',', $dataUserDaysCountVocReport),
+            'countVocabulary' => $countVocabulary,
+        ]);
     }
 }
