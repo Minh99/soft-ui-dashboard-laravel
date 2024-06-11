@@ -48,7 +48,7 @@
                                     @foreach ($users as $item)
                                         <tr>
                                             <td class="ps-4">
-                                                <p class="text-xs font-weight-bold mb-0">1</p>
+                                                <p class="text-xs font-weight-bold mb-0">{{ $item->id }}</p>
                                             </td>
                                             <td class="text-center">
                                                 <p class="text-xs font-weight-bold mb-0">{{ $item->name }}</p>
@@ -70,7 +70,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-link text-danger text-gradient px-3 mb-0" type="submit"
-                                                        data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Tooltip on left">
+                                                        data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Warning">
                                                         <i class="far fa-trash-alt me-2"></i>Delete
                                                     </button>
                                                 </form>

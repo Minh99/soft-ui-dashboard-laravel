@@ -112,4 +112,34 @@ class InfoUserController extends Controller
             'countVocabulary' => $countVocabulary,
         ]);
     }
+
+
+    public function vocabularies()
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+
+        $vocabularies = Vocabulary::all()->sortByDesc('id');
+        return view('vocabularies', ['vocabularies' => $vocabularies]);
+    }
+
+    public function createVocabulary(Request $request)
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+
+        $data = $request->except('_token');
+        $id = $request->input('uid');
+        
+        if ($id) {
+            $vocabulary = Vocabulary::findOrFail($id);
+            $vocabulary->update($data);
+        } else {
+            Vocabulary::create($data);
+        }
+
+        return redirect()->route('vocabularies');
+    }
 }

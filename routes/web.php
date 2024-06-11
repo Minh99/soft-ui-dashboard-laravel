@@ -51,6 +51,9 @@ Route::group(['middleware' => ['auth', 'day']], function () {
 	Route::get('user-report', [InfoUserController::class, 'report'])->name('user-report');
 	Route::get('user-report/{id}', [InfoUserController::class, 'reportDetail'])->name('user-report-detail');
 
+	Route::get('vocabularies', [InfoUserController::class, 'vocabularies'])->name('vocabularies');
+	Route::POST('vocabularies-store', [InfoUserController::class, 'createVocabulary'])->name('vocabularies-store');
+
 
 	// Route::get('tables', function () {
 	// 	return view('tables');
