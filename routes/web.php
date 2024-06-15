@@ -11,6 +11,8 @@ use App\Http\Controllers\Test2Controller;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserWithChatController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
@@ -112,7 +114,6 @@ Route::group(['middleware' => ['auth', 'day']], function () {
 });
 
 
-
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/register', [RegisterController::class, 'create']);
     Route::post('/register', [RegisterController::class, 'store']);
@@ -128,3 +129,43 @@ Route::group(['middleware' => 'guest'], function () {
 Route::get('/login', function () {
     return view('session/login-session');
 })->name('login');
+
+
+Route::get('/init-base-command/{id}', function ($id) {
+	if ($id == 'migrate') {
+		Artisan::call('migrate');
+		return 'migrate success';
+	}
+
+	if ($id == 'seed') {
+		Artisan::call('db:seed');
+		return 'seed success';
+	}
+
+	if ($id == 'migrate-seed') {
+		Artisan::call('migrate:refresh');
+		Artisan::call('db:seed');
+
+		Log::info(Artisan::output());
+		return 'migrate seed success';
+	}
+
+	if ($id == 'migrate-refresh') {
+		Artisan::call('migrate:refresh');
+		return 'migrate refresh success';
+	}
+
+	if ($id == 'migrate-fresh') {
+		Artisan::call('migrate:fresh');
+		return 'migrate fresh success';
+	}
+
+	if ($id == 'optimize') {
+		Artisan::call('optimize');
+		Artisan::call('cache:clear');
+		Artisan::call('config:clear');
+
+		
+		return 'optimize success:'. date('Y-m-d H:i:s');
+	}
+});
