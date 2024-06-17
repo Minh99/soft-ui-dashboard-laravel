@@ -127,7 +127,6 @@
             }
         });
 
-
         var ctx = document.getElementById('chart-line-user').getContext('2d');
         var valueBeforeOneDay = 0;
         var percentageValues = dataUserDaysCountVocReport.split(',').map((value) => {
@@ -174,11 +173,18 @@
                         duration: 400,
                         easing: 'linear',
                         loop: (context) => context.active
-                    }
                     },
-                    hoverRadius: 12,
-                    hoverBackgroundColor: 'yellow',
-                    interaction: {
+                    tension: {
+                        duration: 2000,
+                        easing: 'easeInExpo',
+                        from: 0.5,
+                        to: 0,
+                        loop: true
+                    },
+                },
+                hoverRadius: 12,
+                hoverBackgroundColor: 'yellow',
+                interaction: {
                     mode: 'nearest',
                     intersect: false,
                     axis: 'x',

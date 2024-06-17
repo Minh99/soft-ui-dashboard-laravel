@@ -27,8 +27,6 @@
 <script>
     const data = @json($data);
     const userTest2Id = @json($userTest2Id);
-    console.log(data);
-    console.log(userTest2Id);
     document.addEventListener('DOMContentLoaded', function() {
         $('#submit').click(function() {
             const texteds = $('input[type="text"]');
@@ -59,7 +57,6 @@
                     });
                 });
 
-                console.log(dataSubmit);
                 $.ajax({
                     url: "{{ route('test2-submit') }}",
                     type: "POST",
@@ -73,8 +70,6 @@
                     },
                     success: function(response) {
                         var $data = response?.data;
-                        console.log($data);
-                        console.log(response.status);
                         if (response.status === 200) {
                             var countCorrect = 0;
                             if ($data == null) {
@@ -90,7 +85,6 @@
                                 sentenceDom.find('span').remove();
                             });
                             $data.forEach(function(value) {
-                                console.log(value);
                                 let sentences = value.sentences;
                                 let example = value.example ?? [];
                                 let result = value.result ?? false;

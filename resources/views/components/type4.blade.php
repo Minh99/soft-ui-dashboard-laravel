@@ -25,8 +25,6 @@
 <script>
     const data = @json($data);
     const userTest2Id = @json($userTest2Id);
-    console.log(data);
-    console.log(userTest2Id);
     document.addEventListener('DOMContentLoaded', function() {
         $('#submit').click(function() {
             const texteds = $('input[type="text"]');
@@ -55,8 +53,6 @@
                     });
                 });
 
-                console.log(dataSubmit);
-
                 $.ajax({
                     url: "{{ route('test2-submit') }}",
                     type: 'POST',
@@ -70,8 +66,6 @@
                     },
                     success: function(response) {
                         var $data = response?.data;
-                        console.log($data);
-                        console.log(response.status);
                         if (response.status === 200 || $data == null) {
                             var countCorrect = 0;
 

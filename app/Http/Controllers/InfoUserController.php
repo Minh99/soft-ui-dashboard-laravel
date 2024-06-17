@@ -77,13 +77,37 @@ class InfoUserController extends Controller
         return redirect()->route('user-management');
     }
 
+    public function randomColor()
+    {
+        $color = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        return $color;
+    }
+
     public function report()
     {
         if (!Auth::user()->is_admin) {
             return redirect()->route('dashboard');
         }
 
-        $users = User::all()->where('is_admin', false)->sortByDesc('created_at');
+        $users = User::all()->where('is_admin', false)->sortByDesc('name');
+
+        $users = $users->map(function ($user) {
+            $userDays = $user->dayCompleteds()->orderBy('day_number', 'asc')->get();
+            $dataUserDaysCountVocReport = [];
+            $countPre = 0;
+            foreach ($userDays as $key => $userDay) {
+                $uniques = array_unique(json_decode($userDay->vocabulary_ids, true) ?? []);
+                $dataUserDaysCountVocReport[] = count($uniques) - $countPre;
+                $countPre = count($uniques);
+            }
+
+            $user->dataUserDaysCountVocReport = implode(',', $dataUserDaysCountVocReport);
+            $user->color = $this->randomColor();
+
+            return $user;
+        });
+
+        $users = $users->toArray();
 
         return view('user-report', ['users' => $users]);
     }
@@ -100,8 +124,9 @@ class InfoUserController extends Controller
         $dataUserDaysCountVocReport = [];
         $countPre = 0;
         foreach ($userDays as $key => $userDay) {
-            $dataUserDaysCountVocReport[] = count(json_decode($userDay->vocabulary_ids, true) ?? []) - $countPre;
-            $countPre = count(json_decode($userDay->vocabulary_ids, true) ?? []);
+            $uniques = array_unique(json_decode($userDay->vocabulary_ids, true) ?? []);
+            $dataUserDaysCountVocReport[] = count($uniques) - $countPre;
+            $countPre = count($uniques);
         }
 
         $countVocabulary = Vocabulary::count();

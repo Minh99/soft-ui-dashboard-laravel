@@ -10,7 +10,7 @@ use App\Models\Vocabulary;
 class PromptService extends BaseService
 {
     protected $baseService;
-    const LIMIT_WORDS_GEN = 200;
+    const LIMIT_WORDS_GEN = 150;
     const TYPE_PROMPT_1 = 1; // 1 : tự luận, 2 : trăc nghiệm
     const TYPE_PROMPT_2 = 2;
 
@@ -101,16 +101,18 @@ class PromptService extends BaseService
 
         if ($random === self::TYPE_PROMPT_1) {
             $prompt = "Tôi đang đi dạy học sinh các từ vựng tiếng anh sau: [$vocabularies]
-                \nHãy tạo ra 1 câu chuyện $LIMIT_WORDS_GEN từ với chủ đề [$topicName], có sử dụng các từ vựng tiếng anh sau: \n [$vocabularies]
+                \nHãy tạo ra 1 câu chuyện dưới $LIMIT_WORDS_GEN từ với chủ đề [$topicName], câu chuyện tạo ra đơn giản không chứa các từ quá khó, và phải có sử dụng các từ vựng tiếng anh sau: \n [$vocabularies]
                 \nKết quả trả dưới dạng JSON (không chứa các ký tự đặc biệt làm hỏng format JSON):
-                \nOutput:\n{ \"content\": \"Content story\", \"words\": [{\"word\":\"love\", \"explanation\": \"love is love\"}] }
+                \nexplanation sẽ chỉ bao gôm 2 item là 2 ngôn ngữ là tiếng anh và tiếng hàn
+                \nOutput:\n{ \"content\": \"Content story\", \"words\": [{\"word\":\"love\", \"explanation\": {\"en\": \"love is love\", \"ko\": \"사랑은 사랑입니다\"}}] }
             ";
         } else {
             $prompt = "Tôi đang đi dạy học sinh các từ vựng tiếng anh sau: [$vocabularies]
-                \nHãy tạo ra 1 câu chuyện $LIMIT_WORDS_GEN từ với chủ đề [$topicName], có sử dụng các từ vựng tiếng anh sau: \n $vocabularies
+                \nHãy tạo ra 1 câu chuyện dưới $LIMIT_WORDS_GEN từ với chủ đề [$topicName], câu chuyện tạo ra đơn giản không chứa các từ quá khó, và phải có sử dụng các từ vựng tiếng anh sau: \n $vocabularies
                 \nKèm theo $countVoc câu hỏi trắc nghiệm dựa theo câu chuyện, mỗi câu hỏi có 4 đáp án, mỗi đáp án là 1 object, các đáp án là các từ vựng để học sinh chọn và chỉ có 1 đáp án đúng, và quy định đáp án là A, B, C hoặc D.
                 \nKết quả trả dưới dạng JSON (không chứa các ký tự đặc biệt làm hỏng format JSON):
-                \nOutput:\n{ \"content\": \"Content story\", \"words\": [{\"word\":\"love\", \"explanation\": \"love is love\"}], \"questions\": [{\"question\": \"how to xxx\",\"answers\": [  { \"A\" : \"xxx\"},  { \"B\" : \"xxx\"},  { \"C\" : \"xxx\"},  { \"D\" : \"xxx\"}],\"answer_correct\" : \"A\"}] }
+                \nexplanation sẽ chỉ bao gôm 2 item là 2 ngôn ngữ là tiếng anh và tiếng hàn
+                \nOutput:\n{ \"content\": \"Content story là\", \"words\": [{\"word\":\"love\", \"explanation\": {\"en\": \"love is love\", \"ko\": \"사랑은 사랑입니다\"}}], \"questions\": [{\"question\": \"how to xxx\",\"answers\": [  { \"A\" : \"xxx\"},  { \"B\" : \"xxx\"},  { \"C\" : \"xxx\"},  { \"D\" : \"xxx\"}],\"answer_correct\" : \"A\"}] }
             ";
         }
 
@@ -183,7 +185,7 @@ class PromptService extends BaseService
         $ens2 = array_slice($ens, $take / 2);
         $ens1Implode = implode(', ', $ens1);
         $ens2Implode = implode(', ', $ens2);
-        $prompt = "Tôi đang dạy cho học sinh các từ: [$ens1Implode] và [$ens2Implode].\nTạo giúp tôi 2 đoạn văn mẫu để điền từ vựng thích hợp vào chỗ trống. mỗi mẫu lấy 1 danh sachs từ vựng tương ứng đã cho và sẽ có các vị trí dấu ____ (để học sinh điền) và đảm bảo mỗi đoạn văn chỉ cần tối đa 4 chỗ trống. Hãy làm sao cho đoạn văn lấy được có nghĩa nhất có thể và 2 đoạn văn sẽ cần điền đầy đủ các từ vựng đã đưa ra.\nNote:\n- Lưu ý là Graph là nội dung mà bạn tạo ra\n- Nếu có nhiều hơn từ xuất hiện, chỉ cần tạo ra tối thiêu 4 khoảng trống ____ .\n- dữ liệu trả về dưới dạng json.\n- options là lựa chọn để học sinh sẽ dựa vào.\n- correct_answer là kết quả lần lượt từng khoảng trống.\noutput:\n[{\n\"graph: \"xxx\",\n\"options: [\"x\",\"x\",\"x\",\"x\"]\n\"correct_answer:  [\"x\",\"x\",\"x\",\"x\"]\n}]";
+        $prompt = "Tôi đang dạy cho học sinh các từ: [$ens1Implode] và [$ens2Implode].\nTạo giúp tôi 2 đoạn văn mẫu để điền từ vựng thích hợp vào chỗ trống. mỗi mẫu lấy 1 danh sách từ vựng tương ứng đã cho và sẽ có các vị trí dấu ____ (để học sinh điền) và đảm bảo mỗi đoạn văn luôn luôn có 4 chỗ trống. Hãy làm sao cho đoạn văn lấy được có nghĩa nhất có thể và 2 đoạn văn sẽ cần điền đầy đủ các từ vựng đã đưa ra.\nNote:\n- Lưu ý là Graph là nội dung mà bạn tạo ra\n- Nếu có nhiều hơn từ xuất hiện, luôn luôn tạo ra 4 khoảng trống ____ .\n- dữ liệu trả về dưới dạng json.\n- options là lựa chọn để học sinh sẽ dựa vào.\n- correct_answer là kết quả lần lượt từng khoảng trống.\noutput:\n[{\n\"graph: \"xxx\",\n\"options: [\"x\",\"x\",\"x\",\"x\"]\n\"correct_answer:  [\"x\",\"x\",\"x\",\"x\"]\n}]";
         
         return $prompt;
     }

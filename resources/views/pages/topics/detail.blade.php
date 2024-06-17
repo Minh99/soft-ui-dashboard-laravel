@@ -41,7 +41,8 @@
                                     </div>
                                     <div class="d-flex align-items-start flex-column justify-content-center px-2">
                                         <h6 class="mb-0 text-sm">{{ $word['word']}} <i onclick="speak('{{ $word['word'] }}')" id="vocabulary-one-listen" class="fas fa-headphones text-secondary text-sm mx-2"></i> </h6>
-                                        <p class="mb-0 text-xs">{{ $word['explanation']}}</p>
+                                        <p class="mb-0 text-xs">{{ $word['explanation']['en'] ?? $word['explanation'] }}</p>
+                                        <p class="mb-0 text-xs">{{ $word['explanation']['ko'] ?? null }}</p>
                                     </div>
                                     <a target="_blank" class="btn btn-link pe-3 ps-0 mb-0 ms-auto" href="https://papago.naver.com/?sk=en&tk=ko&hn=1&st={{ $word['word'] }}">
                                         <i class="fas fa-external-link-alt text-secondary text-sm"></i>
@@ -144,7 +145,6 @@
         var typeQuiz = @json($typeQuiz);
         var questions = @json($questions);
 
-        console.log(questions);
         if (typeQuiz == 1) {
             setTimeout(() => {
                 getQuestion(0);
@@ -158,7 +158,6 @@
 
             let countDone = $('#quiz').data('done');
 
-            console.log(countQuetion, countDone);
             if (parseInt(countQuetion) >= parseInt(countDone)) {
                 $('#mark-done').removeClass('d-none');
             }
@@ -255,14 +254,10 @@
 
                                     $('#area-quiz').append(html);
                                 } else {
-                                    console.log(data);
                                     alert('Something went wrong! Please try again later.');
                                 }
                             },
                             error: function() {
-                                console.log("error");
-                                console.log(data);
-                                console.log("error=====");
                                 alert('Something went wrong! Please try again later.');
                             },
                             complete: function() {

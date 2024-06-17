@@ -98,7 +98,6 @@
                     }
                 },
                 error: function (error) {
-                    console.log(error);
                     alert('Something went wrong');
                 },
                 complete: function () {
@@ -151,7 +150,6 @@
                     chatContainer.scrollTop(chatContainer[0].scrollHeight);
                 },
                 error: function (error) {
-                    console.log(error);
                     alert('Something went wrong');
                 },
                 complete: function () {

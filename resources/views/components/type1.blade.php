@@ -25,8 +25,6 @@
 <script>
     const data = @json($data);
     const userTest2Id = @json($userTest2Id);
-    console.log(data);
-    console.log(userTest2Id);
     document.addEventListener('DOMContentLoaded', function() {
         $('#submit').click(function() {
             const selected = $(`input[type='radio']:checked`);
@@ -42,9 +40,7 @@
 
             var dataSubmit = [];
             var sentences = $('.sentence-item');
-            console.log(sentences);
             sentences.each(function(index, item) {
-                console.log(item);
                 const id = $(item).data('uid');
                 const sentence = $(item).data('sentence');
                 const answer = $(item).find('input[type="radio"]:checked').val();
@@ -55,7 +51,6 @@
                 });
             });
 
-            console.log(dataSubmit);
             $('.loader').show();
 
             $.ajax({
@@ -68,7 +63,6 @@
                 },
                 success: function(response) {
                     var $data = response?.data;
-                    console.log($data);
                     if (response.status === 200) {
                         var countCorrect = 0;
                         $data.forEach(function(item) {

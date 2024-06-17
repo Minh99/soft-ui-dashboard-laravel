@@ -12,6 +12,7 @@ use Gemini\Data\Content;
 use Gemini\Enums\Role as EnumsRole;
 use GeminiAPI\Client;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
@@ -67,6 +68,11 @@ class TopicController extends Controller
         $content = $data['content'] ?? "";
         $words = $data['words'] ?? [];
         $questions = $data['questions'] ?? [];
+
+        if ($content) {
+            // convert string to markdown
+            $content = Markdown::parse($content);
+        }
 
         return view('pages.topics.detail', ['topicUser' => $topicUser, 'content' => $content, 'words' => $words, 'questions' => $questions, 'typeQuiz' => $typeQuiz]);
     }
