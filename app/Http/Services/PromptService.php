@@ -111,7 +111,7 @@ class PromptService extends BaseService
                 \nHãy tạo ra 1 câu chuyện dưới $LIMIT_WORDS_GEN từ với chủ đề [$topicName], câu chuyện tạo ra đơn giản không chứa các từ quá khó, và phải có sử dụng các từ vựng tiếng anh sau: \n $vocabularies
                 \nKèm theo $countVoc câu hỏi trắc nghiệm dựa theo câu chuyện, mỗi câu hỏi có 4 đáp án, mỗi đáp án là 1 object, các đáp án là các từ vựng để học sinh chọn và chỉ có 1 đáp án đúng, và quy định đáp án là A, B, C hoặc D.
                 \nKết quả trả dưới dạng JSON (không chứa các ký tự đặc biệt làm hỏng format JSON):
-                \nexplanation sẽ chỉ bao gôm 2 item là 2 ngôn ngữ là tiếng anh và tiếng hàn
+                \nexplanation sẽ chỉ bao gôm 2 item là 2 ngôn ngữ là tiếng anh và tiếng hàn, answers sẽ là 4 đáp án và mỗi đáp án sẽ là 1 object, answer_correct là đáp án đúng
                 \nOutput:\n{ \"content\": \"Content story là\", \"words\": [{\"word\":\"love\", \"explanation\": {\"en\": \"love is love\", \"ko\": \"사랑은 사랑입니다\"}}], \"questions\": [{\"question\": \"how to xxx\",\"answers\": [  { \"A\" : \"xxx\"},  { \"B\" : \"xxx\"},  { \"C\" : \"xxx\"},  { \"D\" : \"xxx\"}],\"answer_correct\" : \"A\"}] }
             ";
         }
