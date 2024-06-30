@@ -100,7 +100,15 @@ class Test2Controller extends Controller
 
     public function test2(Request $request)
     {
+        // randome from 1 - 4, not use 2
         $typeRandom = rand(1, 4);
+        if ($typeRandom == 2) {
+            while ($typeRandom == 2) {
+                $typeRandom = rand(1, 4);
+            }
+        }
+
+
         $user = auth()->user();
         $userDayCompleted = $user->dayCompleteds()->where('is_completed', false)->first();
         
@@ -210,7 +218,7 @@ class Test2Controller extends Controller
                 $prompt = $this->promptService->promptSubmitTest2ByType1($data);
                 break;
             case self::LONG_QUIZ:
-                $prompt = '';
+                $prompt = ''; // check client
                 break;
             case self::SUGGESTION_QUIZ:
                 $prompt = $this->promptService->promptSubmitTest2ByType3($data);
@@ -223,6 +231,10 @@ class Test2Controller extends Controller
                 break;
         }
 
+        Log::info([
+            '$type' => $type,
+            '$prompt' => $prompt,
+        ]);
         if ($prompt === '') {
             return response()->json([
                 'status' => 400,

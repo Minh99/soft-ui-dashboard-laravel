@@ -83,24 +83,33 @@
                                 label.removeClass('text-danger');
                                 label.find('span').remove();
                                 sentenceDom.find('span').remove();
+                                sentenceDom.find('br').remove();
                             });
                             $data.forEach(function(value) {
                                 let sentences = value.sentences;
                                 let example = value.example ?? [];
                                 let result = value.result ?? false;
+                                let explain = value.explain ?? '';
+                                let how_to_fail = value.how_to_fail ?? '';
                                 let id = value.id;
                                 let sentenceDom = $(`#sentence-${id}`);
                                 if (result) {
                                     countCorrect++;
                                     var label = sentenceDom.find('label');
                                     label.append(`<span> ✅ </span>`);
+                                    example.forEach(function(it) {
+                                        sentenceDom.append(`<span class="text-success text-sm"> 📝 ${it}</span><br>`)
+                                    });
+                                    sentenceDom.append(`<span class="text-success text-sm"> 🌟 ${explain}</span><br>`)
                                 } else {
                                     var label = sentenceDom.find('label');
                                     label.addClass('text-danger');
                                     label.append(`<span> ❌ </span>`);
+                                    sentenceDom.append(`<span class="text-danger text-sm"> 🚫 ${how_to_fail}</span><br>`)
                                     example.forEach(function(it) {
                                         sentenceDom.append(`<span class="text-danger text-sm"> 📝 ${it}</span><br>`)
                                     });
+                                    sentenceDom.append(`<span class="text-danger text-sm"> 🌟 ${explain}</span><br>`)
                                 }
                             });
 

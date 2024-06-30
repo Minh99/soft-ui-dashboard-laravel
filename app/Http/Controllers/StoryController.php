@@ -321,7 +321,7 @@ class StoryController extends Controller
         $prompt = "Trả lời cho câu hỏi bạn đã tạo ra: [$question]. \nCâu trả lời của tôi là: [$answer]" . 
             "\nUser query:" .
             "\n- Nếu câu trả lời đúng, Hãy chúc mừng theo nhiều kiểu khác nhau.
-            \nKết quả Trả về một chuỗi JSON được định dạng như sau:\n
+            \nKết quả Trả về một chuỗi JSON (không chứa các ký tự đặc biệt làm hỏng format JSON):\n
             {
                 \"is_correct\": true,
                 \"comment\": \"Chúc mừng bằng tiếng anh.\",
@@ -333,9 +333,9 @@ class StoryController extends Controller
             \n3.Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng].
             \n4.Sai mất rồi, câu trả lời đúng phải là: [câu trả lời đúng]. Động viên bạn làm tốt hơn lần sau.
             \n5.Câu trả lời chưa chính xác, câu trả lời đúng là: [câu trả lời đúng]. Bạn cần phải đọc kỹ hơn.
-            \nKết quả Trả về một chuỗi JSON được định dạng như sau:\n
+            \nKết quả Trả về một chuỗi JSON (không chứa các ký tự đặc biệt làm hỏng format JSON):\n
             {
-                \"is_correct\": boolean,
+                \"is_correct\": false,
                 \"comment\": \"Trả lời bằng tiếng anh theo 5 cách trên\",
                 \"correct_answer\": \"câu trả lời đúng\"
             }\n

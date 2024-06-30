@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Topic;
 use App\Models\User;
 use App\Models\Vocabulary;
 use Illuminate\Http\Request;
@@ -166,5 +167,48 @@ class InfoUserController extends Controller
         }
 
         return redirect()->route('vocabularies');
+    }
+
+    public function topicsManagement()
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+
+        $topics = Topic::all()->sortByDesc('id');
+        return view('topics-management', ['topics' => $topics]);
+    }
+
+    public function createTopicsManagement(Request $request)
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+
+        $data = $request->except('_token');
+        $id = $request->input('uid');
+        $data['slug'] = uniqid('topic-') . '-slug';
+        
+        if ($id) {
+            $Topic = Topic::findOrFail($id);
+            $Topic->update($data);
+        } else {
+            Topic::create($data);
+        }
+
+        return redirect()->route('topicsManagement');
+    }
+
+    public function deleteTopicsManagement(Request $request)
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+
+        $id = $request->input('uid');
+        $Topic = Topic::findOrFail($id);
+        $Topic->delete();
+
+        return redirect()->route('topicsManagement')->with('success', 'Topic deleted successfully');
     }
 }

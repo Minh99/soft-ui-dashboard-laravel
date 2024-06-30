@@ -56,6 +56,10 @@ Route::group(['middleware' => ['auth', 'day']], function () {
 	Route::get('vocabularies', [InfoUserController::class, 'vocabularies'])->name('vocabularies');
 	Route::POST('vocabularies-store', [InfoUserController::class, 'createVocabulary'])->name('vocabularies-store');
 
+	Route::get('topics-management', [InfoUserController::class, 'topicsManagement'])->name('topicsManagement');
+	Route::POST('topics-management-create', [InfoUserController::class, 'createTopicsManagement'])->name('createTopicsManagement');
+	Route::post('topics-management-delete', [InfoUserController::class, 'deleteTopicsManagement'])->name('deleteTopicsManagement');
+
 
 	// Route::get('tables', function () {
 	// 	return view('tables');

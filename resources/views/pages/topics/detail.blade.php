@@ -295,8 +295,14 @@
 
                     $('#submit-tn').text('Check again');
 
-                    if (count >= questions.length - 3) {
-                        $('#mark-done').removeClass('d-none');
+                    if (questions.length >= 6) {
+                        if (count >= 5) {
+                            $('#mark-done').removeClass('d-none');
+                        }
+                    } else {
+                        if (count >= 3) {
+                            $('#mark-done').removeClass('d-none');
+                        }
                     }
                 });
             });
