@@ -22,6 +22,7 @@
 <hr>
 @endforeach
 <button class="btn btn-primary mb-2 mt-2" id="submit">Submit</button>
+<br>
 <button class="btn btn-success mb-2 mt-2 d-none" id="submit-done">Mark as done</button>
 
 <script>

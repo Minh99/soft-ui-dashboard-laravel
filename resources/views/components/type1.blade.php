@@ -20,6 +20,7 @@
     </div>
 @endforeach
 <button type="button" class="btn btn-primary" id="submit">Submit</button>
+<br>
 <button type="button" class="btn btn-success d-none" id="submit-done"> Mark as done </button>
 
 <script>

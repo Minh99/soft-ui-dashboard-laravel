@@ -59,24 +59,20 @@
                     </span>
                     <div class="timeline-content">
                         <h6 class="text-dark text-sm font-weight-bold mb-0">
-                            4 Story, 5 Words / 1 Story  {{ ($userDay->day_number > 2 || ($userDay->day_number == 2 && $userDay->is_passed_test_2 == 1)) ? '✅' : '' }}
+                            2 Story, 5 Words / 1 Story  {{ ($userDay->day_number > 2 || ($userDay->day_number == 2 && $userDay->is_passed_test_2 == 1)) ? '✅' : '' }}
                             {{ ($userDay->day_number == 2 && $userDay->is_passed_test_2 == 0) ? '🔥' : '' }}
                             {{ $userDay->day_number < 2 ? '🔒' : '' }}
                         </h6>
                         @php
                             $percent = $userDay->day_number < 2 ? ' 0%' : ' 100%✔️';
                             if ($userDay->day_number == 2 ) {
-                                if ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1 && $userDay->is_passed_quiz_story_3 == 1 && $userDay->is_passed_quiz_story_4 == 1) {
+                                if ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1) {
                                     $percent = ' 98%';
                                     if ($userDay->is_passed_test_2 == 1) {
                                         $percent = ' 100%✔️';
                                     }
-                                } elseif ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1 && $userDay->is_passed_quiz_story_3 == 1) {
-                                    $percent = ' 75%';
-                                } elseif ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1) {
-                                    $percent = ' 50%';
                                 } elseif ($userDay->is_passed_quiz_story_1 == 1) {
-                                    $percent = ' 25%';
+                                    $percent = ' 50%';
                                 } else {
                                     $percent = ' 0%';
                                 }
@@ -105,24 +101,20 @@
                     </span>
                     <div class="timeline-content">
                         <h6 class="text-dark text-sm font-weight-bold mb-0">
-                            4 Story, 5 Words / 1 Story {{ ($userDay->day_number > 3 || ($userDay->day_number == 3 && $userDay->is_passed_test_2 == 1)) ? '✅' : '' }}
+                            2 Story, 5 Words / 1 Story {{ ($userDay->day_number > 3 || ($userDay->day_number == 3 && $userDay->is_passed_test_2 == 1)) ? '✅' : '' }}
                             {{ ($userDay->day_number == 3 && $userDay->is_passed_test_2 == 0) ? '🔥' : '' }}
                             {{ $userDay->day_number < 3 ? '🔒' : '' }}
                         </h6>
                         @php
                             $percent = $userDay->day_number < 3 ? ' 0%' : ' 100%✔️';
                             if ($userDay->day_number == 3 ) {
-                                if ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1 && $userDay->is_passed_quiz_story_3 == 1 && $userDay->is_passed_quiz_story_4 == 1) {
+                                if ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1) {
                                     $percent = ' 98%';
                                     if ($userDay->is_passed_test_2 == 1) {
                                         $percent = ' 100%✔️';
                                     }
-                                } elseif ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1 && $userDay->is_passed_quiz_story_3 == 1) {
-                                    $percent = ' 75%';
-                                } elseif ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1) {
-                                    $percent = ' 50%';
                                 } elseif ($userDay->is_passed_quiz_story_1 == 1) {
-                                    $percent = ' 25%';
+                                    $percent = ' 50%';
                                 } else {
                                     $percent = ' 0%';
                                 }
@@ -191,24 +183,20 @@
                     </span>
                     <div class="timeline-content">
                         <h6 class="text-dark text-sm font-weight-bold mb-0">
-                            4 Story, 5 Words / 1 Story  {{ ($userDay->day_number > 5 || ($userDay->day_number == 5 && $userDay->is_passed_test_2 == 1)) ? '✅' : '' }}
+                            2 Story, 5 Words / 1 Story  {{ ($userDay->day_number > 5 || ($userDay->day_number == 5 && $userDay->is_passed_test_2 == 1)) ? '✅' : '' }}
                             {{ ($userDay->day_number == 5 && $userDay->is_passed_test_2 == 0) ? '🔥' : '' }}
                             {{ $userDay->day_number < 5 ? '🔒' : '' }}
                         </h6>
                         @php
                             $percent = $userDay->day_number < 5 ? ' 0%' : ' 100%✔️';
                             if ($userDay->day_number == 5) {
-                                if ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1 && $userDay->is_passed_quiz_story_3 == 1 && $userDay->is_passed_quiz_story_4 == 1) {
+                                if ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1) {
                                     $percent = ' 98%';
                                     if ($userDay->is_passed_test_2 == 1) {
                                         $percent = ' 100%✔️';
                                     }
-                                } elseif ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1 && $userDay->is_passed_quiz_story_3 == 1) {
-                                    $percent = ' 75%';
-                                } elseif ($userDay->is_passed_quiz_story_1 == 1 && $userDay->is_passed_quiz_story_2 == 1) {
-                                    $percent = ' 50%';
                                 } elseif ($userDay->is_passed_quiz_story_1 == 1) {
-                                    $percent = ' 25%';
+                                    $percent = ' 50%';
                                 } else {
                                     $percent = ' 0%';
                                 }

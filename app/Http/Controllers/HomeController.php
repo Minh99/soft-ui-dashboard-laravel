@@ -334,8 +334,8 @@ class HomeController extends Controller
         } else {
             $isPassedQuizStory1 = $userDay->is_passed_quiz_story_1;
             $isPassedQuizStory2 = $userDay->is_passed_quiz_story_2;
-            $isPassedQuizStory3 = $userDay->is_passed_quiz_story_3;
-            $isPassedQuizStory4 = $userDay->is_passed_quiz_story_4;
+            // $isPassedQuizStory3 = $userDay->is_passed_quiz_story_3;
+            // $isPassedQuizStory4 = $userDay->is_passed_quiz_story_4;
             $dayNumber = $userDay->day_number;
 
             switch ($dayNumber) {
@@ -356,12 +356,12 @@ class HomeController extends Controller
                     if ($isPassedQuizStory1 && !$isPassedQuizStory2) {
                         $userDay->is_passed_quiz_story_2 = true;
                     }
-                    if ($isPassedQuizStory1 && $isPassedQuizStory2 && !$isPassedQuizStory3) {
-                        $userDay->is_passed_quiz_story_3 = true;
-                    }
-                    if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isPassedQuizStory3 && !$isPassedQuizStory4) {
-                        $userDay->is_passed_quiz_story_4 = true;
-                    }
+                    // if ($isPassedQuizStory1 && $isPassedQuizStory2 && !$isPassedQuizStory3) {
+                    //     $userDay->is_passed_quiz_story_3 = true;
+                    // }
+                    // if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isPassedQuizStory3 && !$isPassedQuizStory4) {
+                    //     $userDay->is_passed_quiz_story_4 = true;
+                    // }
                     break;
                 case 4:
                 case 6:

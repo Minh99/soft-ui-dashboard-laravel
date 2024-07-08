@@ -24,8 +24,8 @@ class ProcessDayNumber
                 $isOverNewDay = $userDayCompleted->created_at->format('Y-m-d') !== now()->format('Y-m-d');
                 $isPassedQuizStory1 = $userDayCompleted->is_passed_quiz_story_1;
                 $isPassedQuizStory2 = $userDayCompleted->is_passed_quiz_story_2;
-                $isPassedQuizStory3 = $userDayCompleted->is_passed_quiz_story_3;
-                $isPassedQuizStory4 = $userDayCompleted->is_passed_quiz_story_4;
+                // $isPassedQuizStory3 = $userDayCompleted->is_passed_quiz_story_3;
+                // $isPassedQuizStory4 = $userDayCompleted->is_passed_quiz_story_4;
                 $isPassedTest2 = $userDayCompleted->is_passed_test_2;
                 $isPassedFirstQuiz = $userDayCompleted->is_passed_first_quiz;
                 $dayNumber = $userDayCompleted->day_number;
@@ -43,7 +43,8 @@ class ProcessDayNumber
                     case 2:
                     case 3:
                     case 5:
-                        if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isPassedQuizStory3 && $isPassedQuizStory4 && $isOverNewDay && $isPassedTest2) {
+                        // if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isPassedQuizStory3 && $isPassedQuizStory4 && $isOverNewDay && $isPassedTest2) {
+                        if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isOverNewDay && $isPassedTest2) {
                             $userDayCompleted->is_completed = true;
                             $userDayCompleted->save();
                             $isInsert = true;

@@ -66,7 +66,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header pb-0 p-3">
-                            <h6 class="mb-0"> Questions and Answers (Complete at least {{ $typeQuiz == 2 ?  count($questions) : count($words) }} questions) </h6>
+                            <h6 class="mb-0"> Questions and Answers (Complete at least {{ $typeQuiz == 2 ?  ceil(count($questions) * ((count($words) + 1)/10)) : count($words) }} questions) </h6>
                         </div>
                         {{-- quiz type 1, tu luan --}}
                         <div class="card-body {{ $typeQuiz == 2 ? 'd-none' : '' }}" id="quiz" data-count-quetion="0" data-done="{{ count($words) }}">
@@ -277,6 +277,7 @@
 
                 $('#submit-tn').click(function() {
                     var questions = @json($questions);
+                    var words = @json($words);
                     var count = 0;
 
                     for (let i = 0; i < questions.length; i++) {
@@ -295,14 +296,9 @@
 
                     $('#submit-tn').text('Check again');
 
-                    if (questions.length >= 6) {
-                        if (count >= 5) {
-                            $('#mark-done').removeClass('d-none');
-                        }
-                    } else {
-                        if (count >= 3) {
-                            $('#mark-done').removeClass('d-none');
-                        }
+                    //  ceil(count($questions) * (count($words)/10)) 
+                    if (count >= Math.ceil(questions.length * ((words.length + 1)/10))) {
+                        $('#mark-done').removeClass('d-none');
                     }
                 });
             });

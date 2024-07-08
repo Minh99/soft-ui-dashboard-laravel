@@ -120,8 +120,12 @@ class Test2Controller extends Controller
 
         if ($dayNumber == 1 && (!$userDayCompleted->is_passed_quiz_story_1 || !$userDayCompleted->is_passed_quiz_story_2)) {
             return redirect()->route('dashboard')->with('error', 'You cannot access final test of day. because you have not completed tasks of day 1.');
-        } elseif (($dayNumber == 2 || $dayNumber == 3 || $dayNumber == 5) &&
-            (!$userDayCompleted->is_passed_quiz_story_1 || !$userDayCompleted->is_passed_quiz_story_2 || !$userDayCompleted->is_passed_quiz_story_3 || !$userDayCompleted->is_passed_quiz_story_4)
+        } 
+        // elseif (($dayNumber == 2 || $dayNumber == 3 || $dayNumber == 5) &&
+        //     (!$userDayCompleted->is_passed_quiz_story_1 || !$userDayCompleted->is_passed_quiz_story_2 || !$userDayCompleted->is_passed_quiz_story_3 || !$userDayCompleted->is_passed_quiz_story_4)
+        // ) {
+        elseif (($dayNumber == 2 || $dayNumber == 3 || $dayNumber == 5) &&
+            (!$userDayCompleted->is_passed_quiz_story_1 || !$userDayCompleted->is_passed_quiz_story_2)
         ) {
             return redirect()->route('dashboard')->with('error', 'You cannot access final test of day. because you have not completed tasks of day ' . $dayNumber . '.');
         } elseif(($dayNumber == 4 || $dayNumber == 6) && !$userDayCompleted->is_passed_first_quiz) {

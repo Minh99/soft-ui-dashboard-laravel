@@ -40,22 +40,23 @@ class PromptService extends BaseService
                 case $dayNumber == 2:
                 case $dayNumber == 3:
                 case $dayNumber == 5:
-                    if (!empty($userDayCompleted->words_to_gen_story_1 
-                        && !empty($userDayCompleted->words_to_gen_story_2 
-                        && !empty($userDayCompleted->words_to_gen_story_3 
-                        && !empty($userDayCompleted->words_to_gen_story_4))))) 
+                    if (!empty($userDayCompleted->words_to_gen_story_1) 
+                        && !empty($userDayCompleted->words_to_gen_story_2)
+                        // && !empty($userDayCompleted->words_to_gen_story_3)
+                        // && !empty($userDayCompleted->words_to_gen_story_4)
+                    )
                     {
-                        // random 1 trong 4
-                        $random = rand(1, 4);
+                        // random 1 trong 2
+                        $random = rand(1, 2);
                         $vocabularies = $userDayCompleted->{"words_to_gen_story_$random"};
                     } else if (!empty($userDayCompleted->words_to_gen_story_1) && !$userDayCompleted->is_passed_quiz_story_1) {
                         $vocabularies = $userDayCompleted->words_to_gen_story_1;
                     } else if (!empty($userDayCompleted->words_to_gen_story_2) && $userDayCompleted->is_passed_quiz_story_1 && !$userDayCompleted->is_passed_quiz_story_2) {
                         $vocabularies = $userDayCompleted->words_to_gen_story_2;
-                    } else if (!empty($userDayCompleted->words_to_gen_story_3) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && !$userDayCompleted->is_passed_quiz_story_3) {
-                        $vocabularies = $userDayCompleted->words_to_gen_story_3;
-                    } else if (!empty($userDayCompleted->words_to_gen_story_4) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && $userDayCompleted->is_passed_quiz_story_3 && !$userDayCompleted->is_passed_quiz_story_4) {
-                        $vocabularies = $userDayCompleted->words_to_gen_story_4;
+                    // } else if (!empty($userDayCompleted->words_to_gen_story_3) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && !$userDayCompleted->is_passed_quiz_story_3) {
+                    //     $vocabularies = $userDayCompleted->words_to_gen_story_3;
+                    // } else if (!empty($userDayCompleted->words_to_gen_story_4) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && $userDayCompleted->is_passed_quiz_story_3 && !$userDayCompleted->is_passed_quiz_story_4) {
+                    //     $vocabularies = $userDayCompleted->words_to_gen_story_4;
                     } else {
                         goto autoGenVocabulary;
                     }
@@ -79,10 +80,10 @@ class PromptService extends BaseService
                             $userDayCompleted->words_to_gen_story_1 = $vocabularies;
                         } elseif (empty($userDayCompleted->words_to_gen_story_2) && $userDayCompleted->is_passed_quiz_story_1 && !$userDayCompleted->is_passed_quiz_story_2) {
                             $userDayCompleted->words_to_gen_story_2 = $vocabularies;
-                        } elseif (empty($userDayCompleted->words_to_gen_story_3) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && !$userDayCompleted->is_passed_quiz_story_3) {
-                            $userDayCompleted->words_to_gen_story_3 = $vocabularies;
-                        } elseif (empty($userDayCompleted->words_to_gen_story_4) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && $userDayCompleted->is_passed_quiz_story_3 && !$userDayCompleted->is_passed_quiz_story_4) {
-                            $userDayCompleted->words_to_gen_story_4 = $vocabularies;
+                        // } elseif (empty($userDayCompleted->words_to_gen_story_3) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && !$userDayCompleted->is_passed_quiz_story_3) {
+                        //     $userDayCompleted->words_to_gen_story_3 = $vocabularies;
+                        // } elseif (empty($userDayCompleted->words_to_gen_story_4) && $userDayCompleted->is_passed_quiz_story_1 && $userDayCompleted->is_passed_quiz_story_2 && $userDayCompleted->is_passed_quiz_story_3 && !$userDayCompleted->is_passed_quiz_story_4) {
+                        //     $userDayCompleted->words_to_gen_story_4 = $vocabularies;
                         } else {
                             $userDayCompleted->words_to_gen_story_1 = $vocabularies;
                         }
@@ -98,6 +99,8 @@ class PromptService extends BaseService
         $LIMIT_WORDS_GEN = self::LIMIT_WORDS_GEN;
         $random = rand(self::TYPE_PROMPT_1, self::TYPE_PROMPT_2);
         $countVoc = count(explode(',', $vocabularies));
+        // tính toán phần trăm của countVoc => lấy ra con số của 150% của countVoc
+        $countVoc = ceil($countVoc * 1.5);
 
         if ($random === self::TYPE_PROMPT_1) {
             $prompt = "Tôi đang đi dạy học sinh các từ vựng tiếng anh sau: [$vocabularies]
@@ -161,10 +164,10 @@ class PromptService extends BaseService
 
     public function promptGenTest2ByType1()
     {
-        $limitSentence = 5;
+        $take = 8;
         $ens = $this->getEnsToGenTest2();
         $ensImplode = implode(', ', $ens);
-        $prompt = "Tôi đang học các từ vựng [$ensImplode], Giúp tôi tạo $limitSentence câu đơn khác nhau,  mỗi câu đơn có bao gồm các dấu chấm blank để điền từ vựng đúng, và tôi sẽ điền các từ vựng sau chỗ trống\nUser query:\n- Các từ vựng: [$ensImplode]\n- Mỗi câu chỉ một chỗ trống\n- Mỗi câu chỉ bao gồm 1-2 options\n- Trả về format JSON\n\noutput:\n[\n    {\n    \"id\": \"1\",\n \"sentence\": \"My ______ is a furry friend who loves to play fetch.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    },\n    {\n    \"id\": \"2\",\n  \"sentence\": \"I ______ spending time with my family and friends.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    },\n    {\n   \"id\": \"3\",\n   \"sentence\": \"The ______ purred contentedly on the couch.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    }\n  ]";
+        $prompt = "Tôi đang học các từ vựng [$ensImplode], Giúp tôi tạo $take câu đơn khác nhau,  mỗi câu đơn có bao gồm các dấu chấm blank để điền từ vựng đúng, và tôi sẽ điền các từ vựng sau chỗ trống\nUser query:\n- Các từ vựng: [$ensImplode]\n- Mỗi câu chỉ một chỗ trống\n- Mỗi câu chỉ bao gồm 1-2 options\n- Trả về format JSON\n\noutput:\n[\n    {\n    \"id\": \"1\",\n \"sentence\": \"My ______ is a furry friend who loves to play fetch.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    },\n    {\n    \"id\": \"2\",\n  \"sentence\": \"I ______ spending time with my family and friends.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    },\n    {\n   \"id\": \"3\",\n   \"sentence\": \"The ______ purred contentedly on the couch.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    }\n  ]";
         
         return $prompt;
     }
@@ -196,7 +199,8 @@ class PromptService extends BaseService
         $take = 8;
         $ens = $this->getEnsToGenTest2($take);
         $ensImplode = implode(', ', $ens);
-        $prompt = "Tôi đang dạy cho học sinh người Hàn của tôi các từ vựng tiếng anh sau: [$ensImplode]\nHãy giúp rôi tạo ra cho học sinh của mình 5 câu bằng tiếng Hàn, mỗi câu tiếng Hàn liên quan chính xác tới từ vựng tiếng Anh sử dụng để làm mẫu,học sinh sẽ dịch nó ra thành tiếng anh (câu tiếng anh phải chứa các từ tôi đã cho, và buộc phải sát nghĩa với từ vựng đã dùng), mỗi câu chứa 1 - 2 từ tiếng anh.\n- Example: \"이것은 가져가실 건가요, 아니면 배달인가요? ( take-out, delivery)\"\n- Output:- trả về data dưới dạng json (không chứa các ký tự đặc biệt làm hỏng format JSON):\n[{\"id\":1,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":2,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":3,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":4,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":5,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]}]\n- lưu ý: sentences là 100% tiếng hàn\n- các câu không sử dụng lại các từ đã có";
+
+        $prompt = "Tôi đang dạy cho học sinh người Hàn của tôi các từ vựng tiếng anh sau: [$ensImplode]\nHãy giúp rôi tạo ra cho học sinh của mình 8 câu bằng tiếng Hàn, mỗi câu tiếng Hàn liên quan chính xác tới từ vựng tiếng Anh sử dụng để làm mẫu,học sinh sẽ dịch nó ra thành tiếng anh (câu tiếng anh phải chứa các từ tôi đã cho, và buộc phải sát nghĩa với từ vựng đã dùng), mỗi câu chứa 1 - 2 từ tiếng anh.\n- Example: \"이것은 가져가실 건가요, 아니면 배달인가요? ( take-out, delivery)\"\n- Output:- trả về data dưới dạng json (không chứa các ký tự đặc biệt làm hỏng format JSON):\n[{\"id\":1,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":2,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":3,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":4,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]},{\"id\":5,\"sentences\":\"xxx\",\"suggest_words\":[\"x\",\"x\"]}]\n- lưu ý: sentences là 100% tiếng hàn\n- các câu không sử dụng lại các từ đã có";
         
         return $prompt;
     }
@@ -211,7 +215,7 @@ class PromptService extends BaseService
 
     public function promptGenTest2ByType4()
     {
-        $take = 5;
+        $take = 8;
         $ens = $this->getEnsToGenTest2($take);
         $ensImplode = implode(', ', $ens);
         $count = count($ens);
