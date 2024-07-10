@@ -164,7 +164,7 @@ class PromptService extends BaseService
 
     public function promptGenTest2ByType1()
     {
-        $take = 8;
+        $take = 5;
         $ens = $this->getEnsToGenTest2();
         $ensImplode = implode(', ', $ens);
         $prompt = "Tôi đang học các từ vựng [$ensImplode], Giúp tôi tạo $take câu đơn khác nhau,  mỗi câu đơn có bao gồm các dấu chấm blank để điền từ vựng đúng, và tôi sẽ điền các từ vựng sau chỗ trống\nUser query:\n- Các từ vựng: [$ensImplode]\n- Mỗi câu chỉ một chỗ trống\n- Mỗi câu chỉ bao gồm 1-2 options\n- Trả về format JSON\n\noutput:\n[\n    {\n    \"id\": \"1\",\n \"sentence\": \"My ______ is a furry friend who loves to play fetch.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    },\n    {\n    \"id\": \"2\",\n  \"sentence\": \"I ______ spending time with my family and friends.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    },\n    {\n   \"id\": \"3\",\n   \"sentence\": \"The ______ purred contentedly on the couch.\",\n      \"options\": [\"cat\", \"dog\", \"love\"]\n    }\n  ]";
@@ -182,7 +182,7 @@ class PromptService extends BaseService
 
     public function promptGenTest2ByType2()
     {
-        $take = 8;
+        $take = 5;
         $ens = $this->getEnsToGenTest2($take);
         $ens1 = array_slice($ens, 0, $take / 2);
         $ens2 = array_slice($ens, $take / 2);
@@ -196,7 +196,7 @@ class PromptService extends BaseService
 
     public function promptGenTest2ByType3()
     {
-        $take = 8;
+        $take = 5;
         $ens = $this->getEnsToGenTest2($take);
         $ensImplode = implode(', ', $ens);
 
@@ -215,7 +215,7 @@ class PromptService extends BaseService
 
     public function promptGenTest2ByType4()
     {
-        $take = 8;
+        $take = 5;
         $ens = $this->getEnsToGenTest2($take);
         $ensImplode = implode(', ', $ens);
         $count = count($ens);

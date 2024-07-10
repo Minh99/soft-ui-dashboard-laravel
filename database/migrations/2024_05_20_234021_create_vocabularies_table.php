@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('vocabularies', function (Blueprint $table) {
             $table->id();
             $table->string('en');
-            $table->string('vi');
+            $table->string('vi')->nullable();
             $table->string('ko');
             $table->timestamps();
         });

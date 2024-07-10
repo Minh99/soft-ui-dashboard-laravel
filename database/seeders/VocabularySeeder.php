@@ -13,236 +13,248 @@ class VocabularySeeder extends Seeder
      */
     public function run(): void
     {
+        // INSERT INTO vocabularies (id, en, ko, vi, created_at, updated_at)
+        // VALUES (1,"Dozing off", "깜빡 졸다", null, now(), now()),
+        // (2,"Best Friend", "친한 친구", null, now(), now()),
+        // (3,"Pass with flying colors", "좋은 성과를 이루었다", null, now(), now()),
+        // (4,"Bully", "욕하다, 괴롭히다", null, now(), now()),
+        // (5,"Classmate", "반친구", null, now(), now()),
+        // (6,"Procrastination", "미루기,지연", null, now(), now()),
+        // (7,"Achievement", "성과,성취", null, now(), now()),
+        // (8,"Stay focus", "에 집중하다", null, now(), now()),
+        // (9,"Yearbook album", "졸업 앨범", null, now(), now()),
+        // (10,"Graduation ceremony", "졸업식", null, now(), now()),
+        // (11,"Frustration", "좌절", null, now(), now()),
+        // (12,"Support", "지원, 지지하다", null, now(), now()),
+        // (13,"Loose-leaf book", "낱장 묶음책", null, now(), now()),
+        // (14,"Locker room gossip", "틸의실 험담", null, now(), now()),
+        // (15,"Timetable", "시간표", null, now(), now()),
+        // (16,"Enroll", "등록하다", null, now(), now()),
+        // (17,"Confidence", "자신감", null, now(), now()),
+        // (18,"Pressed for time", "시간 쫓기다", null, now(), now()),
+        // (19,"Drown in", "예 빠져들다", null, now(), now()),
+        // (20,"Term paper", "학기 논문", null, now(), now()),
+        // (21,"Class Clown", "반장난꾼", null, now(), now()),
+        // (22,"Bunk out", "수업 땡땡치다", null, now(), now()),
+        // (23,"Dormitory", "기숙사", null, now(), now()),
+        // (24,"Grade", "성적", null, now(), now()),
+        // (25,"Come up with", "생각해 내다", null, now(), now()),
+        // (26,"Re-enter school", "재입학하다", null, now(), now()),
+        // (27,"Minor in", "부전공하다", null, now(), now()),
+        // (28,"Major in", "전공하다", null, now(), now()),
+        // (29,"Make-up class", "보강 수업", null, now(), now()),
+        // (30,"Zone out", "맹해지다, 집중에 잃다", null, now(), now()),
+        // (31,"Bookworm", "모범생", null, now(), now()),
+        // (32,"Hang out", "놀러가다", null, now(), now()),
+        // (33,"Clear sb desk", "책상 정리하다", null, now(), now()),
+        // (34,"Lack of foundation", "기초 부족", null, now(), now()),
+        // (35,"Cheat off of", "시험에 부정행위하다", null, now(), now()),
+        // (36,"Pull an all-nighter", "밤샘공부", null, now(), now()),
+        // (37,"Perfect attendance", "완벽한 출석, 개근", null, now(), now()),
+        // (38,"Scholarship", "장학금", null, now(), now()),
+        // (39,"Torn between", "~ 사이에 갈등하다", null, now(), now()),
+        // (40,"Principal", "교장", null, now(), now());
+
         $vocabularies = [
             [
-                'en' => 'Oscillating between',
-                'vi' => 'Do dự',
-                'ko' => '둘 중에',
+                'en' => 'Dozing off',
+                'vi' => null,
+                'ko' => '깜빡 졸다'
             ],
             [
-                'en' => 'Hanging up in the air',
-                'vi' => 'Chưa quyết định được',
-                'ko' => '미지수에 걸리다',
+                'en' => 'Best Friend',
+                'vi' => null,
+                'ko' => '친한 친구'
             ],
             [
-                'en' => 'Torn between',
-                'vi' => 'Cân nhắc, đang đau đầu giữa việc quyết định',
-                'ko' => '갈등하다',
-            ],
-            [
-                'en' => 'Scholarship',
-                'vi' => 'Học bổng',
-                'ko' => '장학금',
-            ],
-            [
-                'en' => 'a perfect attendance',
-                'vi' => 'Đi học đủ',
-                'ko' => '완벽한 출석',
-            ],
-            [
-                'en' => 'An all-nighter',
-                'vi' => 'Học xuyên đêm',
-                'ko' => '밤샘 공부',
-            ],
-            [
-                'en' => 'A cram session',
-                'vi' => 'Học gấp rút',
-                'ko' => '강박적 공부',
-            ],
-            [
-                'en' => 'Cheat off of',
-                'vi' => 'Gian lận',
-                'ko' => '표절하다',
-            ],
-            [
-                'en' => 'Taking a crash course',
-                'vi' => 'Khoá học ngắn hạn',
-                'ko' => '짧은 기간 동안 강의 듣기',
-            ],
-            [
-                'en' => 'Clear your desk',
-                'vi' => 'Dọn bàn',
-                'ko' => '책상 정리하다',
-            ],
-            [
-                'en' => 'Flunk',
-                'vi' => 'Trượt môn',
-                'ko' => '누제하다',
-            ],
-            [
-                'en' => 'Roll off',
-                'vi' => 'Lăn, rơi',
-                'ko' => '떨어지다',
-            ],
-            [
-                'en' => 'Home-schooled',
-                'vi ' => 'Học tại nhà',
-                'ko' => '가정교육을 받은',
-            ],
-            [
-                'en' => 'Seek and find',
-                'vi' => 'Tìm kiếm',
-                'ko' => '찾아보다',
-            ],
-            [
-                'en' => 'Make-up class',
-                'vi' => 'Lớp học bù',
-                'ko' => '보강 수업',
-            ],
-            [
-                'en' => 'Major in',
-                'vi' => 'Chuyên ngành chính',
-                'ko' => '전공하다',
-            ],
-            [
-                'en' => 'Minor in',
-                'vi' => 'Chuyên ngành phụ',
-                'ko' => '부전공하다',
-            ],
-            [
-                'en' => 'Re-enter school',
-                'vi' => 'Đi học lại',
-                'ko' => '재학하다',
-            ],
-            [
-                'en' => 'Come up with',
-                'vi' => 'Nảy ra ý tưởng',
-                'ko' => '생각해 내다',
-            ],
-            [
-                'en' => 'Plenty of time',
-                'vi' => 'Nhiều thời gian',
-                'ko' => '여유 많다',
-            ],
-            [
-                'en' => 'A heavy course load',
-                'vi' => 'Học cùng một lúc nhiều môn',
-                'ko' => '많은 수업 부담',
-            ],
-            [
-                'en' => 'Bunk out',
-                'vi' => 'Bùng học',
-                'ko' => '수업 땡떙치다',
-            ],
-            [
-                'en' => 'Class clown',
-                'vi' => 'Cây hài trong lớp',
-                'ko' => '반장난꾼',
-            ],
-            [
-                'en' => 'Term paper',
-                'vi' => 'Luận văn',
-                'ko' => '학기 논문',
-            ],
-            [
-                'en' => 'Drown in',
-                'vi' => 'Chìm vào, tập trung vào',
-                'ko' => '에 빠져들다',
-            ],
-            [
-                'en' => 'Pressed for time',
-                'vi' => 'Thời gian gấp rút',
-                'ko' => '시간 촉박하다',
-            ],
-            [
-                'en' => 'Smear',
-                'vi' => 'Vết bẩn, vết ố',
-                'ko' => '얼룩',
-            ],
-            [
-                'en' => 'Scan',
-                'vi' => 'Scan',
-                'ko' => '스캔하다',
-            ],
-            [
-                'en' => 'Due',
-                'vi' => 'Sắp đến hạn',
-                'ko' => '마감일이 다가오다',
-            ],
-            [
-                'en' => 'Locker room gossip',
-                'vi' => 'Tin đồn',
-                'ko' => '탈의실소문',
-            ],
-            [
-                'en' => 'Binder clips',
-                'vi' => 'Kẹp tài liệu',
-                'ko' => '바인더 클립',
-            ],
-            [
-                'en' => 'Loose-leaf book',
-                'vi' => 'Sổ không gáy',
-                'ko' => '반백(반구)책',
-            ],
-            [
-                'en' => 'Rollerball pens',
-                'vi' => 'Bút bi',
-                'ko' => '롤러볼 펜',
-            ],
-            [
-                'en' => 'Cushion grip',
-                'vi' => 'Đệm cầm tay',
-                'ko' => '쿠션 그립',
-            ],
-            [
-                'en' => 'Graducation ceremony',
-                'vi' => 'Lễ tốt nghiệp',
-                'ko' => '졸업식',
-            ],
-            [
-                'en' => 'Yearbook’s signning',
-                'vi' => 'Kí kỷ yếu',
-                'ko' => '졸업앨범 서명',
-            ],
-            [
-                'en' => 'Stay focus',
-                'vi' => 'Tập trung',
-                'ko' => '집중',
-            ],
-            [
-                'en' => 'Teacher’s louge',
-                'vi' => 'Phòng nghỉ giáo viên',
-                'ko' => '교사실',
-            ],
-            [
-                'en' => 'Rusyproof',
-                'vi' => 'Chống nước',
-                'ko' => '방수',
-            ],
-            [
-                'en' => 'Align',
-                'vi' => 'Sắp xếp',
-                'ko' => '정렬하다',
-            ],
-            [
-                'en' => 'Classmate',
-                'vi' => 'Bạn học cùng lớp',
-                'ko' => '친구반',
+                'en' => 'Pass with flying colors',
+                'vi' => null,
+                'ko' => '좋은 성과를 이루었다'
             ],
             [
                 'en' => 'Bully',
-                'vi' => 'Chửi, mắng, nói xấu',
-                'ko' => '욕하다',
+                'vi' => null,
+                'ko' => '욕하다, 괴롭히다'
             ],
             [
-                'en' => 'Bunk together',
-                'vi' => 'Cùng nhau trải qua một ngày, đi chơi,ăn uống, ngủ cùng',
-                'ko' => '같이 지내다, 같이 자다',
+                'en' => 'Classmate',
+                'vi' => null,
+                'ko' => '반친구'
             ],
             [
-                'en' => 'lick the flap',
-                'vi' => 'Liếm dìa phong bì',
-                'ko' => '봉투를 빨다',
+                'en' => 'Procrastination',
+                'vi' => null,
+                'ko' => '미루기,지연'
             ],
             [
-                'en' => 'Water-based ink',
-                'vi' => 'Mực chống nước',
-                'ko' => '수성 잉크',
+                'en' => 'Achievement',
+                'vi' => null,
+                'ko' => '성과,성취'
             ],
             [
-                'en' => 'Dozing off',
-                'vi' => 'Buồn ngủ',
-                'ko' => '졸다',
+                'en' => 'Stay focus',
+                'vi' => null,
+                'ko' => '에 집중하다'
+            ],
+            [
+                'en' => 'Yearbook album',
+                'vi' => null,
+                'ko' => '졸업 앨범'
+            ],
+            [
+                'en' => 'Graduation ceremony',
+                'vi' => null,
+                'ko' => '졸업식'
+            ],
+            [
+                'en' => 'Frustration',
+                'vi' => null,
+                'ko' => '좌절'
+            ],
+            [
+                'en' => 'Support',
+                'vi' => null,
+                'ko' => '지원, 지지하다'
+            ],
+            [
+                'en' => 'Loose-leaf book',
+                'vi' => null,
+                'ko' => '낱장 묶음책'
+            ],
+            [
+                'en' => 'Locker room gossip',
+                'vi' => null,
+                'ko' => '틸의실 험담'
+            ],
+            [
+                'en' => 'Timetable',
+                'vi' => null,
+                'ko' => '시간표'
+            ],
+            [
+                'en' => 'Enroll',
+                'vi' => null,
+                'ko' => '등록하다'
+            ],
+            [
+                'en' => 'Confidence',
+                'vi' => null,
+                'ko' => '자신감'
+            ],
+            [
+                'en' => 'Pressed for time',
+                'vi' => null,
+                'ko' => '시간 쫓기다'
+            ],
+            [
+                'en' => 'Drown in',
+                'vi' => null,
+                'ko' => '예 빠져들다'
+            ],
+            [
+                'en' => 'Term paper',
+                'vi' => null,
+                'ko' => '학기 논문'
+            ],
+            [
+                'en' => 'Class Clown',
+                'vi' => null,
+                'ko' => '반장난꾼'
+            ],
+            [
+                'en' => 'Bunk out',
+                'vi' => null,
+                'ko' => '수업 땡땡치다'
+            ],
+            [
+                'en' => 'Dormitory',
+                'vi' => null,
+                'ko' => '기숙사'
+            ],
+            [
+                'en' => 'Grade',
+                'vi' => null,
+                'ko' => '성적'
+            ],
+            [
+                'en' => 'Come up with',
+                'vi' => null,
+                'ko' => '생각해 내다'
+            ],
+            [
+                'en' => 'Re-enter school',
+                'vi' => null,
+                'ko' => '재입학하다'
+            ],
+            [
+                'en' => 'Minor in',
+                'vi' => null,
+                'ko' => '부전공하다'
+            ],
+            [
+                'en' => 'Major in',
+                'vi' => null,
+                'ko' => '전공하다'
+            ],
+            [
+                'en' => 'Make-up class',
+                'vi' => null,
+                'ko' => '보강 수업'
+            ],
+            [
+                'en' => 'Zone out',
+                'vi' => null,
+                'ko' => '맹해지다, 집중에 잃다'
+            ],
+            [
+                'en' => 'Bookworm',
+                'vi' => null,
+                'ko' => '모범생'
+            ],
+            [
+                'en' => 'Hang out',
+                'vi' => null,
+                'ko' => '놀러가다'
+            ],
+            [
+                'en' => 'Clear sb desk',
+                'vi' => null,
+                'ko' => '책상 정리하다'
+            ],
+            [
+                'en' => 'Lack of foundation',
+                'vi' => null,
+                'ko' => '기초 부족'
+            ],
+            [
+                'en' => 'Cheat off of',
+                'vi' => null,
+                'ko' => '시험에 부정행위하다'
+            ],
+            [
+                'en' => 'Pull an all-nighter',
+                'vi' => null,
+                'ko' => '밤샘공부'
+            ],
+            [
+                'en' => 'Perfect attendance',
+                'vi' => null,
+                'ko' => '완벽한 출석, 개근'
+            ],
+            [
+                'en' => 'Scholarship',
+                'vi' => null,
+                'ko' => '장학금'
+            ],
+            [
+                'en' => 'Torn between',
+                'vi' => null,
+                'ko' => '~ 사이에 갈등하다'
+            ],
+            [
+                'en' => 'Principal',
+                'vi' => null,
+                'ko' => '교장'
             ],
         ];
 
