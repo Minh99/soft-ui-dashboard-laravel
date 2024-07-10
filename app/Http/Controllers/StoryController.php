@@ -92,7 +92,6 @@ class StoryController extends Controller
 
     public function formatToJson($text)
     {
-        Log::info($text);
         $cleaned_json_string = str_replace('\"', '`', $text);
         $cleaned_json_string = str_replace('\\n', '', $cleaned_json_string);
         $cleaned_json_string = str_replace(["json", "```"], '', $cleaned_json_string);
@@ -130,7 +129,12 @@ class StoryController extends Controller
         
         list($vocabulariesToGenStory, $prompt, $typeQuiz) = $this->promptService->promptGenStory($user, $topicName);
 
-        Log::info('vocabulariesToGenStory: '. $vocabulariesToGenStory);
+        Log::info('vocabulariesToGenStory: ', [
+            'user' => $user->id,
+            'vocabulariesToGenStory' => $vocabulariesToGenStory,
+            'prompt' => $prompt,
+            'typeQuiz' => $typeQuiz,
+        ]);
         
         $basePrompt = [
             [
@@ -359,7 +363,11 @@ class StoryController extends Controller
 
             $text = $response->text();
             $cleaned_json_string = $this->formatToJson($text);
-            Log::info($text);
+            Log::info('Generated answer: ', [
+                'user' => $user->id,
+                'text' => $text,
+                'cleaned_json_string' => $cleaned_json_string,
+            ]);
 
             $historyChatTmp[] = [
                 "part" => $prompt,

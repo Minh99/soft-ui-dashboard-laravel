@@ -86,15 +86,12 @@ class Test2Controller extends Controller
 
     public function formatToJson($text)
     {
-        Log::info($text);
         $cleaned_json_string = str_replace('\"', '`', $text);
         $cleaned_json_string = str_replace('\\n', '', $cleaned_json_string);
         $cleaned_json_string = str_replace(["json", "```"], '', $cleaned_json_string);
         $cleaned_json_string = preg_replace('/\n+/', '', $cleaned_json_string);
         $cleaned_json_string = trim($cleaned_json_string, '"');
 
-        Log::info($cleaned_json_string);
-        
         return $cleaned_json_string;
     }
 
@@ -235,10 +232,14 @@ class Test2Controller extends Controller
                 break;
         }
 
+        $user = auth()->user() ?? abort(404);
+
         Log::info([
-            '$type' => $type,
-            '$prompt' => $prompt,
+            'user' => $user->id,
+            'type' => $type,
+            'prompt' => $prompt,
         ]);
+
         if ($prompt === '') {
             return response()->json([
                 'status' => 400,
@@ -256,10 +257,15 @@ class Test2Controller extends Controller
 
             $response = $chat->sendMessage($prompt);
 
-
             $text = $response->text();
-
             $cleaned_json_string = $this->formatToJson($text);
+
+            Log::info([
+                'user' => $user->id,
+                'text' => $text,
+                'cleaned_json_string' => $cleaned_json_string,
+            ]);
+
 
             $historiesTmp[] = [
                 "part" => $prompt,
