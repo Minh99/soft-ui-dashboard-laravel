@@ -5,7 +5,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4 mx-4">
-                    <div class="card-header pb-0">
+                    <div class="card-header pb-0" style="
+                            background: linear-gradient(-75deg, #f5e8f4, #ffffff);
+                            box-shadow: 0 0 6px rgba(0, 0, 0, 0.1); 
+                            border-radius: 10px;
+                        ">
                         <canvas id="vocabChart" width="400" height="200"></canvas>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2 mt-4">
@@ -31,11 +35,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($users as $item)
+                                    @foreach ($users as $k => $item)
                                         <tr>
                                             <td class="ps-4">
                                                 <div class="row justify-content-center align-items-center">
-                                                    <p class="text-sm font-weight-bold mb-0 col-md-6 m-auto">{{  $item['id'] }}</p>
+                                                    <p class="text-sm font-weight-bold mb-0 col-md-6 m-auto">{{  $k }}</p>
                                                     <p class="col-md-6 text-center m-auto" style="background: {{ $item['color'] }}; max-height: 10px; max-width: 15px">&nbsp;</p>
                                                 </div>
                                             </td>
@@ -75,34 +79,47 @@
             return color;
         }
 
-        const labels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6'];
+        const labels = ['Day 1', 'Day 2', 'Day 3'];
 
         // convert students object to datasets array
 
         const datasets = Object.entries(students).map(([student, data]) => {
-            console.log(data);
+            // console.log(data);
             var vocabData = data['dataUserDaysCountVocReport']
             var vocabDataArr = vocabData.split(',');
-            if (vocabDataArr.length < 6) {
-                for (let i = vocabDataArr.length; i < 6; i++) {
-                    vocabDataArr.push(0);
+            var preCount = 0;
+            for (let i = 0; i < vocabDataArr.length; i++) {
+                preCount = parseInt(vocabDataArr[i]) + preCount;
+                vocabDataArr[i] = preCount;
+            }
+            
+            if (vocabDataArr.length < 3) {
+                preCount = 0;
+                for (let i = vocabDataArr.length; i < 3; i++) {
+                    let currentCount = parseInt(vocabDataArr[vocabDataArr.length - 1]);
+                    vocabDataArr.push(currentCount);
                 }
             }
+
             return {
                 label: data['name'],
                 data: vocabDataArr,
                 borderColor: data['color'] ?? getRandomColor(),
                 backgroundColor: data['color'] ?? getRandomColor(),
-                fill: false
+                fill: false,
+                tension: 0.1,
+                borderWidth: 2,
+                pointRadius: 2,
+                pointHoverRadius: 8,
+                xAxisID: 'x-axis-1',
             };
         });
 
         console.log(datasets);
 
-
         const data = {
             labels: labels,
-            datasets: datasets
+            datasets: [datasets[0]],
         };
 
         const config = {
@@ -110,36 +127,75 @@
             data: data,
             options: {
                 responsive: true,
+                elements: { 
+                    point: {
+                        radius: 6,
+                        hitRadius: 6, 
+                        hoverRadius: 6 
+                    } 
+                },
                 plugins: {
                     legend: {
-                        position: 'top',
+                        display: true,
+                        position: 'left',
+                        align: 'start',
+                        labels: {
+                            boxWidth: 8,
+                            padding: 15,
+                            usePointStyle: true,
+                            width: function(context) {
+                                return context.chart.width;
+                            }
+                        }
+                        
                     },
                     title: {
                         display: true,
-                        text: 'User Vocabulary Report'
+                        text: 'VOCABULARY GROWTH CHAR BY DAYS OF STUDENTS',
                     }
                 },
                 scales: {
                     y: {
-                        beginAtZero: true
-                    }
-                },
-                animations: {
-                    tension: {
-                        duration: 5000,
-                        easing: 'easeInExpo',
-                        from: 0.5,
-                        to: 0,
-                        loop: true
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Vocabulary',
+                        },
+                        ticks: {
+                            stepSize: 5
+                        },
+                        min: 0,
+                        max: 50
                     },
                 },
+                // animations: {
+                //     tension: {
+                //         duration: 5000,
+                //         easing: 'easeInExpo',
+                //         from: 0.5,
+                //         to: 0,
+                //         loop: true
+                //     },
+                // },
                 hoverRadius: 12,
                 hoverBackgroundColor: getRandomColor(),
             }
         };
 
         const ctx = document.getElementById('vocabChart').getContext('2d');
-        const vocabChart = new Chart(ctx, config);
+        var vocabChart = new Chart(ctx, config);
+
+        var currentIndex = 1;
+        setInterval(function () {
+            if (currentIndex > datasets.length - 1) {
+                clearInterval();
+            } else {
+                var datasetsArr = vocabChart.data.datasets;
+                vocabChart.data.datasets = datasetsArr.concat(datasets[currentIndex]);
+                currentIndex++;
+            }
+            vocabChart.update();
+        }, 400);
     </script>
     @endpush
 @endsection

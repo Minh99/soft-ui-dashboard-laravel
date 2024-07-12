@@ -95,7 +95,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="timeline-block mb-3">
+                {{-- <div class="timeline-block mb-3">
                     <span class="timeline-step">
                         <i class="fa fa-leanpub text-info text-gradient"></i>
                     </span>
@@ -136,14 +136,14 @@
                             @endif
                         </p>
                     </div>
-                </div>
-                <div class="timeline-block mb-3">
+                </div> --}}
+                {{-- <div class="timeline-block mb-3">
                     <span class="timeline-step">
                         <i class="fa fa-comments-o text-warning text-gradient"></i>
                     </span>
                     <div class="timeline-content">
                         <h6 class="text-dark text-sm font-weight-bold mb-0">
-                            Checking daily
+                            Final test
                             {{ $userDay->day_number > 4 ? '✅' : '' }}
                             {{ $userDay->day_number == 4 ? '🔥' : '' }}
                             {{ $userDay->day_number < 4 ? '🔒' : '' }}
@@ -218,20 +218,20 @@
                             @endif
                         </p>
                     </div>
-                </div>
+                </div> --}}
                 <div class="timeline-block">
                     <span class="timeline-step">
                         <i class="fa fa-graduation-cap text-dark text-gradient"></i>
                     </span>
                     <div class="timeline-content">
                         <h6 class="text-dark text-sm font-weight-bold mb-0">
-                            Test final {{ $userDay->day_number > 6 ? '✅' : '' }}
-                            {{ $userDay->day_number == 6 ? ($userDay->is_completed == 0 ? '🔥' : '✅') : '' }}
-                            {{ $userDay->day_number < 6 ? '🔒' : '' }}
+                            Final Test {{ $userDay->day_number > 3 ? '✅' : '' }}
+                            {{ $userDay->day_number == 3 ? ($userDay->is_completed == 0 ? '🔥' : '✅') : '' }}
+                            {{ $userDay->day_number < 3 ? '🔒' : '' }}
                         </h6>
                         @php
-                            $percent = $userDay->day_number < 6 ? ' 0%' : ' 100%✔️';
-                            if ($userDay->day_number == 6 ) {
+                            $percent = $userDay->day_number < 3 ? ' 0%' : ' 100%✔️';
+                            if ($userDay->day_number == 3 ) {
                                 if ($userDay->is_passed_first_quiz == 1) {
                                     $percent = ' 98%';
                                     if ($userDay->is_passed_test_2 == 1) {
@@ -243,13 +243,13 @@
                             }
                         @endphp
                         <p class="text-secondary font-weight-bold text-xs mt-1 mb-0">
-                            Day 6: {{ $percent }}
-                            @if ($userDay->day_number == 6 && $userDay->is_completed == 0)
+                            Day 3: {{ $percent }}
+                            @if ($userDay->day_number == 3 && $userDay->is_completed == 0)
                                 <a href="{{ route('quiz') }}"
-                                    class="text-primary text-sm font-weight-bold blink_me">&nbsp; &nbsp;📋Test final&nbsp; &nbsp;
+                                    class="text-primary text-sm font-weight-bold blink_me">&nbsp; &nbsp;📋Final Test&nbsp; &nbsp;
                                 </a>
                             @endif
-                            @if ($userDay->day_number == 6)
+                            @if ($userDay->day_number == 3)
                                 <a href="{{ route('test2') }}"
                                     class="text-primary text-sm font-weight-bold blink_me2">Practice✏️
                                 </a>

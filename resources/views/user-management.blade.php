@@ -66,7 +66,7 @@
                                             </td>
                                             <td class="align-middle ms-auto text-end">
                                                 <a href="{{ route('user-management-store', ['id' => $item->id]) }}" class="btn btn-link text-dark px-3 mb-0" href="javascript:;"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                                                <form  action="{{ route('user-management-store', ['id' => $item->id]) }}" method="POST">
+                                                <form  action="{{ route('user-management-delete', ['id' => $item->id]) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-link text-danger text-gradient px-3 mb-0" type="submit"

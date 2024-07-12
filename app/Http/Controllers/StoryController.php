@@ -233,7 +233,7 @@ class StoryController extends Controller
 
         $historyChat = empty($topicUser->history_chat) ? [] : json_decode($topicUser->history_chat, true);
 
-        $prompt = "Create a question based on the story you wrote and the words you used. The question should be related to the words and their explanations. The question must have an answer, and the answer must be one of the words used in the story.";
+        $prompt = "Tạo một câu hỏi siêu dễ cho cuộc hội thoại đã tạo ra, câu hỏi phải liên quan đến nội dung của cuộc hội thoại.";
         
         $jsonExample = "
             {
@@ -242,7 +242,7 @@ class StoryController extends Controller
             }
         ";
 
-        $prompt .= "\n =>Please return the formatted json string that matches the following model: " . $jsonExample;
+        $prompt .= "\n =>Trả về format Json như mẫu sau (lưu ý không chứa các ký tự đặc biệt làm hỏng format json): " . $jsonExample;
 
         $histories = [];
 

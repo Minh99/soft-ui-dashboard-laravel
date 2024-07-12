@@ -31,9 +31,9 @@
                                 <div class="numbers">
                                     <p class="text-sm mb-0 text-capitalize font-weight-bold">Day/Target</p>
                                     <h5 class="font-weight-bolder mb-0">
-                                        {{ $userDay->day_number }}/6
+                                        {{ $userDay->day_number }}/3
                                         <span
-                                            class="text-success text-sm font-weight-bolder">{{ round(($userDay->day_number * 100) / 6, 2) }}%</span>
+                                            class="text-success text-sm font-weight-bolder">{{ round(($userDay->day_number * 100) / 3, 2) }}%</span>
                                     </h5>
                                 </div>
                             </div>

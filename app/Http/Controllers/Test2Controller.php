@@ -121,11 +121,11 @@ class Test2Controller extends Controller
         // elseif (($dayNumber == 2 || $dayNumber == 3 || $dayNumber == 5) &&
         //     (!$userDayCompleted->is_passed_quiz_story_1 || !$userDayCompleted->is_passed_quiz_story_2 || !$userDayCompleted->is_passed_quiz_story_3 || !$userDayCompleted->is_passed_quiz_story_4)
         // ) {
-        elseif (($dayNumber == 2 || $dayNumber == 3 || $dayNumber == 5) &&
+        elseif (($dayNumber == 2) &&
             (!$userDayCompleted->is_passed_quiz_story_1 || !$userDayCompleted->is_passed_quiz_story_2)
         ) {
             return redirect()->route('dashboard')->with('error', 'You cannot access final test of day. because you have not completed tasks of day ' . $dayNumber . '.');
-        } elseif(($dayNumber == 4 || $dayNumber == 6) && !$userDayCompleted->is_passed_first_quiz) {
+        } elseif($dayNumber == 3 && !$userDayCompleted->is_passed_first_quiz) {
             return redirect()->route('dashboard')->with('error', 'You cannot access final test of day. You need to pass Test daily.');
         }
 
@@ -176,8 +176,21 @@ class Test2Controller extends Controller
             ]);
 
             $data = $cleaned_json_string ? json_decode($cleaned_json_string, true) : [];
+            Log::info([
+                'user' => auth()->id(),
+                'text' => $text,
+                'cleaned_json_string' => $cleaned_json_string,
+            ]);
 
             if (empty($data)) {
+                $numberTry--;
+                if ($numberTry > 0) {
+                    goto retryTest2;
+                }
+                return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+            }
+
+            if ($typeRandom === self::SUGGESTION_QUIZ && !isset($data[0]['sentences'])) {
                 $numberTry--;
                 if ($numberTry > 0) {
                     goto retryTest2;

@@ -90,7 +90,7 @@ class InfoUserController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $users = User::all()->where('is_admin', false)->sortByDesc('name');
+        $users = User::all()->where('is_admin', false)->sortByDesc('created_at');
 
         $users = $users->map(function ($user) {
             $userDays = $user->dayCompleteds()->orderBy('day_number', 'asc')->get();
@@ -210,5 +210,17 @@ class InfoUserController extends Controller
         $Topic->delete();
 
         return redirect()->route('topicsManagement')->with('success', 'Topic deleted successfully');
+    }
+
+    public function delete($id)
+    {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('dashboard');
+        }
+
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect()->route('user-management')->with('success', 'User deleted successfully');
     }
 }

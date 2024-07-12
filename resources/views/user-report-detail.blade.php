@@ -12,15 +12,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body px-0 pt-0 pb-2">
-                        <div class="row align-items-start justify-content-start mb-4">
-                            <canvas id="chart-line-user" class="col-md-8" ></canvas>
+                    <div class="card-body px-auto pt-0 pb-2">
+                        <div class="row justify-content-center">
+                            <canvas id="chart-bars-user" class="col-md-6 col-xl-6" ></canvas>
+                            <canvas id="chart-line-user" class="col-md-6 col-xl-6" ></canvas>
                         </div>
-                        <div class="row align-items-end justify-content-end mb-4">
-                            <canvas id="chart-donut-user" class="col-md-6"></canvas>
-                        </div>
-                        <div class="row">
-                            <canvas id="chart-bars-user" class="col-md-8" ></canvas>
+                        <div class="row align-items-center justify-content-center mb-4">
+                            <canvas id="chart-donut-user" class="col-md-4 col-xl-6"></canvas>
                         </div>
                     </div>
                 </div>
@@ -36,8 +34,8 @@
         var dataUserDaysCountVocReport = @json($dataUserDaysCountVocReport);
         var dataUserDaysCountVocReportArr = dataUserDaysCountVocReport.split(',');
       
-        if (dataUserDaysCountVocReportArr.length < 6) {
-            for (let i = dataUserDaysCountVocReportArr.length; i < 6; i++) {
+        if (dataUserDaysCountVocReportArr.length < 3) {
+            for (let i = dataUserDaysCountVocReportArr.length; i < 3; i++) {
                 dataUserDaysCountVocReportArr.push(0);
             }
         }
@@ -48,7 +46,7 @@
         const stackedBar = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6"],
+                labels: ["Day 1", "Day 2", "Day 3", ''],
                 datasets: [{
                     data: dataUserDaysCountVocReportArr,
                     backgroundColor: [
@@ -71,7 +69,10 @@
                             stepSize: 1,
                             beginAtZero: true
                         },
-                        max: 10
+                        max: 40,
+                        ticks: {
+                            stepSize: 5
+                        },
                     }
                 },
                 plugins: {
@@ -94,7 +95,7 @@
 
         // Tạo biểu đồ mới
         var myDonutChart = new Chart(ctx, {
-            type: 'polarArea', // Kiểu biểu đồ là biểu đồ donut
+            type: 'doughnut', // Kiểu biểu đồ là biểu đồ donut
             data: {
                 labels: ['Known', 'Remaining'], // Các nhãn trên biểu đồ
                 datasets: [{
@@ -121,7 +122,8 @@
                     },
                     title: {
                         display: true,
-                        text: 'Knowledge Words Rate'
+                        text: 'Knowledge Words Rate',
+                        position: 'bottom',
                     }
                 }
             }
@@ -140,7 +142,7 @@
         var myLineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6"],
+                labels: ["Day 1", "Day 2", "Day 3", ''],
                 datasets: [{
                     label: 'Knowledge Words Rate',
                     data: percentageValues,

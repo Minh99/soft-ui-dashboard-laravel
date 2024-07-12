@@ -41,8 +41,6 @@ class ProcessDayNumber
                         }
                         break;
                     case 2:
-                    case 3:
-                    case 5:
                         // if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isPassedQuizStory3 && $isPassedQuizStory4 && $isOverNewDay && $isPassedTest2) {
                         if ($isPassedQuizStory1 && $isPassedQuizStory2 && $isOverNewDay && $isPassedTest2) {
                             $userDayCompleted->is_completed = true;
@@ -50,25 +48,16 @@ class ProcessDayNumber
                             $isInsert = true;
                         }
                         break;
-                    case 4:
-                    case 6:
+                    case 3:
                         if ($isPassedFirstQuiz && $isPassedTest2) {
-                            if ($dayNumber == 4 && $isOverNewDay) {
-                                $userDayCompleted->is_completed = true;
-                                $userDayCompleted->save();
-                                $isInsert = true;
-                            }
-                            if ($isPassedFirstQuiz && $dayNumber == 6) {
-                                $userDayCompleted->is_completed = true;
-                                $userDayCompleted->save();
-                            }
+                            $userDayCompleted->save();
                         }
                         break;
                     default:
                         break;
                 }
 
-                if ($isInsert && $dayNumber < 6) {
+                if ($isInsert && $dayNumber < 3) {
                     DB::table('user_day_completeds')->insert([
                         'user_id' => $user->id,
                         'day_number' => $dayNumber + 1,
@@ -82,6 +71,12 @@ class ProcessDayNumber
                     ]);
                 }
             } else {
+                $userDayCompleted = $user->dayCompleteds()->where('is_completed', true)->orderBy('day_number', 'desc')->first();
+                
+                if ($userDayCompleted && $userDayCompleted->day_number === 3) {
+                    return $next($request);
+                }
+
                 DB::table('user_day_completeds')->insert([
                     'user_id' => $user->id,
                     'day_number' => 1,

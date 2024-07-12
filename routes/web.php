@@ -48,6 +48,7 @@ Route::group(['middleware' => ['auth', 'day']], function () {
 	Route::get('user-management', [InfoUserController::class, 'index'])->name('user-management');
 	// id is optional
 	Route::match(['get', 'post'], 'user-management-store/{id?}', [InfoUserController::class, 'store'])->name('user-management-store');
+	Route::delete('users/{id}', [InfoUserController::class, 'delete'])->name('user-management-delete');
 
 	
 	Route::get('user-report', [InfoUserController::class, 'report'])->name('user-report');

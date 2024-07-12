@@ -223,8 +223,6 @@ class HomeController extends Controller
                     }
                     break;
                 case 2:
-                case 3:
-                case 5:
                     if (!$isPassedQuizStory1) {
                         $userDay->is_passed_quiz_story_1 = true;
                     }
@@ -232,8 +230,7 @@ class HomeController extends Controller
                         $userDay->is_passed_quiz_story_2 = true;
                     }
                     break;
-                case 4:
-                case 6:
+                case 3:
                     $userDay->is_passed_first_quiz = true;
                     break;
                 default:
@@ -300,8 +297,7 @@ class HomeController extends Controller
         $quizTypeRandom = null;
 
         switch ($dayNumber) {
-            case 4:
-            case 6:
+            case 3:
                 $quizTypeRandom = $this->vocabularyService->getQuiz($user, $dayNumber);
                 break;
             default:
@@ -348,8 +344,6 @@ class HomeController extends Controller
                     }
                     break;
                 case 2:
-                case 3:
-                case 5:
                     if (!$isPassedQuizStory1) {
                         $userDay->is_passed_quiz_story_1 = true;
                     }
@@ -363,8 +357,7 @@ class HomeController extends Controller
                     //     $userDay->is_passed_quiz_story_4 = true;
                     // }
                     break;
-                case 4:
-                case 6:
+                case 3:
                     $userDay->is_passed_first_quiz = true;
                     break;
                 default:
